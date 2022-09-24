@@ -39,6 +39,8 @@ modal:bind({"⌃", "⌥", "⌘"}, "U", function()
     hs.http.get("http://127.0.0.1:4456/_/SET/TRACK/2/RECARM/-1")
 end)
 
+local menubar
+
 function modal:entered()
     hs.osascript.applescript(
         [[do shell script "launchctl kickstart -kp system/com.apple.audio.coreaudiod" with administrator privileges]])
@@ -79,6 +81,10 @@ function modal:entered()
                 end
             end)
         end)
+
+        menubar = hs.menubar.new()
+
+        menubar:setTitle("hello")
     end)
 end
 
@@ -96,4 +102,6 @@ function modal:exited()
     if obs ~= nil and (obs:status() == "connecting" or obs:status() == "open") then
         obs:close()
     end
+
+    menubar:delete()
 end
