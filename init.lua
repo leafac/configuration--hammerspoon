@@ -2,6 +2,32 @@ local modal = hs.hotkey.modal.new({"⌘", "⇧"}, "2")
 modal:bind({"⌘", "⇧"}, "2", function() modal:exit() end)
 
 local obs
+local obsCurrentProgramScene
+local function obsConnect()
+    obs = hs.websocket.new("ws://127.0.0.1:4455/",
+                           function(status, messageString)
+        print([[OBS: ‘]] .. tostring(status) .. [[’: ‘]] ..
+                  tostring(messageString) .. [[’]])
+        if status == "received" then
+            local message = hs.json.decode(messageString)
+            if message.op == 0 then
+                obs:send([[
+                    {
+                        "op": 1,
+                        "d": {
+                            "rpcVersion": 1
+                        }
+                    }
+                ]], false)
+            elseif message.op == 7 then
+                if message.d.requestId == "GetCurrentProgramScene" then
+                    obsCurrentProgramScene =
+                        message.d.responseData.currentProgramSceneName
+                end
+            end
+        end
+    end)
+end
 for key, sceneName in pairs({
     ["R"] = "STARTING SOON…",
     ["T"] = "WE’LL BE RIGHT BACK…",
@@ -18,13 +44,16 @@ for key, sceneName in pairs({
     [","] = "GUEST · SKYPE · SCREEN"
 }) do
     modal:bind({"⌃", "⌥", "⌘"}, key, function()
-        if obs ~= nil and obs:status() == "open" then
+        if obs == nil or
+            (obs:status() ~= "connecting" and obs:status() ~= "open") then
+            obsConnect()
+        else
             obs:send([[
                 {
                     "op": 6,
                     "d": {
                         "requestType": "SetCurrentProgramScene",
-                        "requestId": "CHANGE-SCENE",
+                        "requestId": "SetCurrentProgramScene",
                         "requestData": {
                             "sceneName": "]] .. sceneName .. [["
                         }
@@ -62,26 +91,7 @@ function modal:entered()
         hs.application.open("OBS")
         hs.application.open("Keycastr")
 
-        hs.timer.doAfter(5, function()
-            obs = hs.websocket.new("ws://127.0.0.1:4455/",
-                                   function(status, messageString)
-                print([[OBS: ‘]] .. tostring(status) .. [[’: ‘]] ..
-                          tostring(messageString) .. [[’]])
-                if status == "received" then
-                    local message = hs.json.decode(messageString)
-                    if message.op == 0 then
-                        obs:send([[
-                            {
-                                "op": 1,
-                                "d": {
-                                    "rpcVersion": 1
-                                }
-                            }
-                        ]], false)
-                    end
-                end
-            end)
-        end)
+        hs.timer.doAfter(5, obsConnect)
 
         menubar = hs.menubar.new()
         menubarTimer = hs.timer.new(1, function()
@@ -90,7 +100,26 @@ function modal:entered()
                                                                    .get(
                                                                    "http://127.0.0.1:4456/_/TRACK/2")),
                                                         "\t")[4]) & 64 ~= 0
-            menubar:setTitle(isMicrophoneOn and "🔴" or "⚫️")
+
+            if obs == nil or
+                (obs:status() ~= "connecting" and obs:status() ~= "open") then
+                obsConnect()
+                obsCurrentProgramScene = nil
+            else
+                obs:send([[
+                    {
+                        "op": 6,
+                        "d": {
+                            "requestType": "GetCurrentProgramScene",
+                            "requestId": "GetCurrentProgramScene"
+                        }
+                    }
+                ]], false)
+            end
+
+            menubar:setTitle((isMicrophoneOn and "🔴" or "⚫️") ..
+                                 (type(obsCurrentProgramScene) == "string" and
+                                     ([[ ]] .. obsCurrentProgramScene) or ""))
         end)
         menubarTimer:start()
     end)
@@ -110,6 +139,7 @@ function modal:exited()
     if obs ~= nil and (obs:status() == "connecting" or obs:status() == "open") then
         obs:close()
     end
+    obsCurrentProgramScene = nil
 
     menubar:delete()
     menubarTimer:stop()
