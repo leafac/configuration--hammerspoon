@@ -40,6 +40,7 @@ modal:bind({"⌃", "⌥", "⌘"}, "U", function()
 end)
 
 local menubar
+local menubarTimer
 
 function modal:entered()
     hs.osascript.applescript(
@@ -83,8 +84,15 @@ function modal:entered()
         end)
 
         menubar = hs.menubar.new()
-
-        menubar:setTitle("hello")
+        menubarTimer = hs.timer.new(1, function()
+            local isMicrophoneOn = tonumber(
+                                       hs.fnutils.split(select(2, hs.http
+                                                                   .get(
+                                                                   "http://127.0.0.1:4456/_/TRACK/2")),
+                                                        "\t")[4]) & 64 ~= 0
+            menubar:setTitle(isMicrophoneOn and "🔴" or "⚫️")
+        end)
+        menubarTimer:start()
     end)
 end
 
@@ -104,4 +112,5 @@ function modal:exited()
     end
 
     menubar:delete()
+    menubarTimer:stop()
 end
