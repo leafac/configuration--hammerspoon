@@ -35,6 +35,10 @@ for key, sceneName in pairs({
     end)
 end
 
+modal:bind({"⌃", "⌥", "⌘"}, "U", function()
+    hs.http.get("http://127.0.0.1:4456/_/SET/TRACK/2/RECARM/-1")
+end)
+
 function modal:entered()
     hs.osascript.applescript(
         [[do shell script "launchctl kickstart -kp system/com.apple.audio.coreaudiod" with administrator privileges]])
@@ -56,7 +60,7 @@ function modal:entered()
         hs.application.open("Keycastr")
 
         hs.timer.doAfter(5, function()
-            obs = hs.websocket.new("ws://localhost:4455/",
+            obs = hs.websocket.new("ws://127.0.0.1:4455/",
                                    function(status, messageString)
                 print([[OBS: ‘]] .. tostring(status) .. [[’: ‘]] ..
                           tostring(messageString) .. [[’]])
