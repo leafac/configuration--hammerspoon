@@ -1,6 +1,40 @@
 local modal = hs.hotkey.modal.new({"⌘", "⇧"}, "2")
 modal:bind({"⌘", "⇧"}, "2", function() modal:exit() end)
 
+local obs
+for key, sceneName in pairs({
+    ["R"] = "STARTING SOON…",
+    ["T"] = "WE’LL BE RIGHT BACK…",
+    ["Y"] = "THANKS FOR WATCHING",
+    ["F"] = "ME",
+    ["G"] = "GUEST 1",
+    ["H"] = "GUEST 2",
+    ["J"] = "GUEST 3",
+    ["K"] = "GUEST 4",
+    ["V"] = "GRID",
+    ["B"] = "SCREEN",
+    ["N"] = "DESK",
+    ["M"] = "WINDOWS",
+    [","] = "GUEST · SKYPE · SCREEN"
+}) do
+    modal:bind({"⌃", "⌥", "⌘"}, key, function()
+        if obs ~= nil and obs:status() == "open" then
+            obs:send([[
+                {
+                    "op": 6,
+                    "d": {
+                        "requestType": "SetCurrentProgramScene",
+                        "requestId": "CHANGE-SCENE",
+                        "requestData": {
+                            "sceneName": "]] .. sceneName .. [["
+                        }
+                    }
+                }
+            ]], false)
+        end
+    end)
+end
+
 function modal:entered()
     hs.osascript.applescript(
         [[do shell script "launchctl kickstart -kp system/com.apple.audio.coreaudiod" with administrator privileges]])
@@ -20,6 +54,27 @@ function modal:entered()
         hs.application.open("EOS Utility 3")
         hs.application.open("OBS")
         hs.application.open("Keycastr")
+
+        hs.timer.doAfter(5, function()
+            obs = hs.websocket.new("ws://localhost:4455/",
+                                   function(status, messageString)
+                print([[OBS: ‘]] .. tostring(status) .. [[’: ‘]] ..
+                          tostring(messageString) .. [[’]])
+                if status == "received" then
+                    local message = hs.json.decode(messageString)
+                    if message.op == 0 then
+                        obs:send([[
+                            {
+                                "op": 1,
+                                "d": {
+                                    "rpcVersion": 1
+                                }
+                            }
+                        ]], false)
+                    end
+                end
+            end)
+        end)
     end)
 end
 
@@ -33,6 +88,9 @@ function modal:exited()
     audioDevice:setDefaultOutputDevice()
     audioDevice:setDefaultEffectDevice()
     audioDevice:setDefaultInputDevice()
+
+    if obs ~= nil and (obs:status() == "connecting" or obs:status() == "open") then
+        obs:close()
+    end
 end
 
-hs.hotkey.bind({"⌃", "⌥", "⌘"}, ",", function() print("HELLO") end)
