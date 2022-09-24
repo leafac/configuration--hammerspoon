@@ -97,4 +97,3 @@ function modal:exited()
         obs:close()
     end
 end
-
