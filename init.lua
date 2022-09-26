@@ -95,11 +95,12 @@ function modal:entered()
 
         menubar = hs.menubar.new()
         menubarTimer = hs.timer.new(1, function()
-            local isMicrophoneOn = tonumber(
+            local isMicrophoneOn = (tonumber(
                                        hs.fnutils.split(select(2, hs.http
                                                                    .get(
-                                                                   "http://127.0.0.1:4456/_/TRACK/2")),
-                                                        "\t")[4]) & 64 ~= 0
+                                                                   "http://127.0.0.1:4456/_/TRACK/2")) or
+                                                            "", "\t")[4]) or 0) &
+                                       64 ~= 0
 
             if obs == nil or
                 (obs:status() ~= "connecting" and obs:status() ~= "open") then
