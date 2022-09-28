@@ -19,6 +19,10 @@ local function obsConnect()
                         }
                     }
                 ]], false)
+            elseif message.op == 5 then
+                if message.d.eventType == "CurrentProgramSceneChanged" then
+                    obsCurrentProgramScene = message.d.eventData.sceneName
+                end
             elseif message.op == 7 then
                 if message.d.requestId == "GetCurrentProgramScene" then
                     obsCurrentProgramScene =
