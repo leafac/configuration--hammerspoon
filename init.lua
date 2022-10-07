@@ -22,6 +22,12 @@ hs.hotkey.bind({"⌃", "⌥", "⌘"}, "tab", function()
 end)
 
 -------------------------------------------------------------------------------
+-- MENUBAR
+
+local menubar = hs.menubar.new()
+hs.timer.doEvery(1, function() menubar:setTitle(os.date("%Y-%m-%d  %H:%M  %A")) end)
+
+-------------------------------------------------------------------------------
 -- STREAMING
 
 local modal = hs.hotkey.modal.new({"⌘", "⇧"}, "2")
@@ -124,7 +130,7 @@ function modal:entered()
         hs.timer.doAfter(5, obsConnect)
 
         menubar = hs.menubar.new()
-        menubarTimer = hs.timer.new(1, function()
+        menubarTimer = hs.timer.doEvery(1, function()
             local isMicrophoneOn = (tonumber(
                                        hs.fnutils.split(select(2, hs.http
                                                                    .get(
@@ -152,7 +158,6 @@ function modal:entered()
                                  (type(obsCurrentProgramScene) == "string" and
                                      ([[ ]] .. obsCurrentProgramScene) or ""))
         end)
-        menubarTimer:start()
     end)
 end
 
