@@ -25,7 +25,8 @@ end)
 -- MENUBAR
 
 local menubar = hs.menubar.new()
-hs.timer.doEvery(1, function() menubar:setTitle(os.date("%Y-%m-%d  %H:%M  %A")) end)
+hs.timer.doEvery(1,
+                 function() menubar:setTitle(os.date("%Y-%m-%d  %H:%M  %A")) end)
 
 -------------------------------------------------------------------------------
 -- STREAMING
@@ -180,6 +181,115 @@ function modal:exited()
     menubar:delete()
     menubarTimer:stop()
 end
+
+-- TODO: Add markers to stream/recording.
+-------------------------------------------------------------------------------
+-- Show keyboard shortcuts on stream/recording (Work-in-progress)
+-- hs.eventtap.new({hs.eventtap.event.types.keyDown}, function(event)
+--     print("HELLO")
+--     -- local flags = event:getFlags()
+
+--     -- local modifiers = ""
+--     -- if flags.ctrl then modifiers = modifiers .. "^" end
+--     -- if flags.shift then modifiers = modifiers .. "⇧" end
+--     -- if flags.alt then modifiers = modifiers .. "⌥" end
+--     -- if flags.cmd then modifiers = modifiers .. "⌘" end
+
+--     -- local character = hs.keycodes.map[event:getKeyCode()]
+--     -- local specialCharacters = {
+--     --     ["f1"] = true,
+--     --     ["f2"] = true,
+--     --     ["f3"] = true,
+--     --     ["f4"] = true,
+--     --     ["f5"] = true,
+--     --     ["f6"] = true,
+--     --     ["f7"] = true,
+--     --     ["f8"] = true,
+--     --     ["f9"] = true,
+--     --     ["f10"] = true,
+--     --     ["f11"] = true,
+--     --     ["f12"] = true,
+--     --     ["f13"] = true,
+--     --     ["f14"] = true,
+--     --     ["f15"] = true,
+--     --     ["f16"] = true,
+--     --     ["f17"] = true,
+--     --     ["f18"] = true,
+--     --     ["f19"] = true,
+--     --     ["f20"] = true,
+--     --     ["pad"] = true,
+--     --     ["pad*"] = true,
+--     --     ["pad+"] = true,
+--     --     ["pad/"] = true,
+--     --     ["pad-"] = true,
+--     --     ["pad="] = true,
+--     --     ["pad0"] = true,
+--     --     ["pad1"] = true,
+--     --     ["pad2"] = true,
+--     --     ["pad3"] = true,
+--     --     ["pad4"] = true,
+--     --     ["pad5"] = true,
+--     --     ["pad6"] = true,
+--     --     ["pad7"] = true,
+--     --     ["pad8"] = true,
+--     --     ["pad9"] = true,
+--     --     ["padclear"] = true,
+--     --     ["padenter"] = true,
+--     --     ["return"] = true,
+--     --     ["tab"] = true,
+--     --     ["space"] = true,
+--     --     ["delete"] = true,
+--     --     ["escape"] = true,
+--     --     ["help"] = true,
+--     --     ["home"] = true,
+--     --     ["pageup"] = true,
+--     --     ["forwarddelete"] = true,
+--     --     ["end"] = true,
+--     --     ["pagedown"] = true,
+--     --     ["left"] = true,
+--     --     ["right"] = true,
+--     --     ["down"] = true,
+--     --     ["up"] = true,
+--     --     ["shift,"] = true,
+--     --     ["rightshift,"] = true,
+--     --     ["cmd,"] = true,
+--     --     ["rightcmd,"] = true,
+--     --     ["alt,"] = true,
+--     --     ["rightalt,"] = true,
+--     --     ["ctrl,"] = true,
+--     --     ["rightctrl,"] = true,
+--     --     ["capslock,"] = true,
+--     --     ["fn,"] = true
+--     -- }
+
+--     -- if (not flags.shift and not flags.cmd and not flags.alt and not flags.ctrl) then
+--     -- end
+
+--     -- if specialCharacters[character] == nil then
+--     --     character = event:getCharacters(true)
+--     --     if flags.shift then character = string.lower(character) end
+--     -- end
+
+--     -- if character == "return" then
+--     --     character = "⏎"
+--     -- elseif character == "delete" then
+--     --     character = "⌫"
+--     -- elseif character == "escape" then
+--     --     character = "⎋"
+--     -- elseif character == "space" then
+--     --     character = "␣"
+--     -- elseif character == "up" then
+--     --     character = "↑"
+--     -- elseif character == "down" then
+--     --     character = "↓"
+--     -- elseif character == "left" then
+--     --     character = "←"
+--     -- elseif character == "right" then
+--     --     character = "→"
+--     -- end
+
+--     -- hs.alert(modifiers .. character)
+-- end):start()
 
 --[[
 -- https://superuser.com/a/1486266
