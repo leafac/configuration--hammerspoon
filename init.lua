@@ -27,8 +27,10 @@ end)
 menubar = hs.menubar.new()
 menubarTimer = hs.timer.doEvery(1, function()
     menubar:setTitle(os.date("%Y-%m-%d  %H:%M  %A") ..
-                         (type(streamingMenubarTitle) == "string" and
-                             ("  " .. streamingMenubarTitle) or ""))
+                         (type(streamingREAPERMicrophoneEnabled) == "string" and
+                             (" · " .. streamingREAPERMicrophoneEnabled) or "") ..
+                         (type(streamingOBSCurrentProgramScene) == "string" and
+                             (" · " .. streamingOBSCurrentProgramScene) or ""))
 end)
 
 -------------------------------------------------------------------------------
@@ -37,13 +39,15 @@ end)
 streamingModal = hs.hotkey.modal.new({"⌘", "⇧"}, "2")
 streamingModal:bind({"⌘", "⇧"}, "2", function() streamingModal:exit() end)
 
+streamingREAPERMicrophoneEnabled = nil
+
 streamingOBS = nil
 streamingOBSCurrentProgramScene = nil
 
 streamingMenubarTimer = nil
-streamingMenubarTitle = nil
 
 function streamingOBSConnect()
+    streamingOBSCurrentProgramScene = nil
     streamingOBS = hs.websocket.new("ws://127.0.0.1:4455/",
                                     function(status, messageString)
         print([[OBS: ‘]] .. tostring(status) .. [[’: ‘]] ..
@@ -124,31 +128,28 @@ function streamingModal:entered()
 
         hs.wifi.setPower(false)
 
+        local inputDevice = hs.audiodevice.findOutputByName("Call Input")
+        inputDevice:setDefaultInputDevice()
         local outputDevice = hs.audiodevice.findOutputByName("Computer")
         outputDevice:setDefaultOutputDevice()
         outputDevice:setDefaultEffectDevice()
-        local inputDevice = hs.audiodevice.findOutputByName("Call Input")
-        inputDevice:setDefaultInputDevice()
 
         hs.open("/Users/leafac/Videos/STREAM.rpp")
         hs.application.open("EOS Utility 3")
         hs.application.open("OBS")
 
-        hs.timer.doAfter(5, streamingOBSConnect)
-
         streamingMenubarTimer = hs.timer.doEvery(1, function()
-            local isMicrophoneOn = (tonumber(
-                                       hs.fnutils.split(select(2, hs.http
-                                                                   .get(
-                                                                   "http://127.0.0.1:4456/_/TRACK/2")) or
-                                                            "", "\t")[4]) or 0) &
-                                       64 ~= 0
+            streamingREAPERMicrophoneEnabled =
+                ((tonumber(hs.fnutils.split(select(2, hs.http
+                                                       .get(
+                                                       "http://127.0.0.1:4456/_/TRACK/2")) or
+                                                "", "\t")[4]) or 0) & 64 ~= 0) and
+                    "🔴" or "⬛️"
 
             if streamingOBS == nil or
                 (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~=
                     "open") then
                 streamingOBSConnect()
-                streamingOBSCurrentProgramScene = nil
             else
                 streaming:send([[
                     {
@@ -160,13 +161,6 @@ function streamingModal:entered()
                     }
                 ]], false)
             end
-
-            streamingMenubarTitle = (isMicrophoneOn and "🔴" or "⬛️") ..
-                                        (type(streamingOBSCurrentProgramScene) ==
-                                            "string" and
-                                            (" " ..
-                                                streamingOBSCurrentProgramScene) or
-                                            "")
         end)
     end)
 end
@@ -178,9 +172,11 @@ function streamingModal:exited()
     hs.wifi.setPower(true)
 
     local audioDevice = hs.audiodevice.findOutputByName("Audient iD14")
+    audioDevice:setDefaultInputDevice()
     audioDevice:setDefaultOutputDevice()
     audioDevice:setDefaultEffectDevice()
-    audioDevice:setDefaultInputDevice()
+
+    streamingREAPERMicrophoneEnabled = nil
 
     if streamingOBS ~= nil and
         (streamingOBS:status() == "connecting" or streamingOBS:status() ==
@@ -188,7 +184,6 @@ function streamingModal:exited()
     streamingOBSCurrentProgramScene = nil
 
     streamingMenubarTimer:stop()
-    streamingMenubarTitle = nil
 end
 
 -- TODO: Add markers to stream/recording.
