@@ -192,6 +192,7 @@ function streamingModal:exited()
 end
 
 -- TODO: Add markers to stream/recording.
+-- TODO: Keycastr
 -------------------------------------------------------------------------------
 -- Show keyboard shortcuts on stream/recording (Work-in-progress)
 -- hs.eventtap.new({hs.eventtap.event.types.keyDown}, function(event)
