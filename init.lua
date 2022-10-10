@@ -212,6 +212,17 @@ function streamingOBSConnect()
                 if message.d.requestId == "GetCurrentProgramScene" then
                     streamingOBSCurrentProgramScene =
                         message.d.responseData.currentProgramSceneName
+                elseif message.d.requestId == "GetStreamStatus" or
+                    message.d.requestId == "GetRecordStatus" then
+                    if message.d.responseData.outputActive then
+                        local file = assert(io.open(
+                                                "/Users/leafac/Videos/MARKERS.txt",
+                                                "a"))
+                        file:write(string.sub(
+                                       message.d.responseData.outputTimecode, 1,
+                                       string.len("00:00:00")) .. "\n")
+                        file:close()
+                    end
                 end
             end
         end
