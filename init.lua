@@ -230,8 +230,6 @@ function streamingOBSConnect()
 end
 
 -------------------------------------------------------------------------------
--- TODO: Add markers to stream/recording. "/Users/leafac/Videos/MARKERS"
-
 -- TODO: Keycastr
 -------------------------------------------------------------------------------
 -- Show keyboard shortcuts on stream/recording (Work-in-progress)
