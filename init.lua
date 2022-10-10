@@ -66,12 +66,13 @@ function streamingModal:entered()
         hs.application.open("OBS")
 
         streamingMenubarTimer = hs.timer.doEvery(1, function()
+            local REAPERResponse = select(2, hs.http
+                                              .get(
+                                              "http://127.0.0.1:4456/_/TRACK/2"))
             streamingREAPERMicrophoneEnabled =
-                ((tonumber(hs.fnutils.split(select(2, hs.http
-                                                       .get(
-                                                       "http://127.0.0.1:4456/_/TRACK/2")) or
-                                                "", "\t")[4]) or 0) & 64 ~= 0) and
-                    "🔴" or "⬛️"
+                ((type(REAPERResponse) == "string") and REAPERResponse ~= "") and
+                    ((tonumber(hs.fnutils.split(REAPERResponse, "\t")[4]) & 64 ~=
+                        0) and "🔴" or "⬛️") or nil
 
             if streamingOBS == nil or
                 (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~=
