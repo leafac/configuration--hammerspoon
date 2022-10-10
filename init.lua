@@ -24,15 +24,16 @@ end)
 -------------------------------------------------------------------------------
 -- MENUBAR
 
-local menubar = hs.menubar.new()
-hs.timer.doEvery(1,
-                 function() menubar:setTitle(os.date("%Y-%m-%d  %H:%M  %A")) end)
+menubar = hs.menubar.new()
+menubarTimer = hs.timer.doEvery(1, function()
+    menubar:setTitle(os.date("%Y-%m-%d  %H:%M  %A"))
+end)
 
 -------------------------------------------------------------------------------
 -- STREAMING
 
-local modal = hs.hotkey.modal.new({"⌘", "⇧"}, "2")
-modal:bind({"⌘", "⇧"}, "2", function() modal:exit() end)
+streamingModal = hs.hotkey.modal.new({"⌘", "⇧"}, "2")
+streamingModal:bind({"⌘", "⇧"}, "2", function() streamingModal:exit() end)
 
 local obs
 local obsCurrentProgramScene
@@ -80,7 +81,7 @@ for key, sceneName in pairs({
     ["M"] = "WINDOWS",
     [","] = "GUEST · SKYPE · SCREEN"
 }) do
-    modal:bind({"⌃", "⌥", "⌘"}, key, function()
+    streamingModal:bind({"⌃", "⌥", "⌘"}, key, function()
         if obs == nil or
             (obs:status() ~= "connecting" and obs:status() ~= "open") then
             obsConnect()
@@ -101,14 +102,14 @@ for key, sceneName in pairs({
     end)
 end
 
-modal:bind({"⌃", "⌥", "⌘"}, "U", function()
+streamingModal:bind({"⌃", "⌥", "⌘"}, "U", function()
     hs.http.get("http://127.0.0.1:4456/_/SET/TRACK/2/RECARM/-1")
 end)
 
 local menubar
 local menubarTimer
 
-function modal:entered()
+function streamingModal:entered()
     hs.osascript.applescript(
         [[do shell script "launchctl kickstart -kp system/com.apple.audio.coreaudiod" with administrator privileges]])
     hs.timer.doAfter(5, function()
@@ -162,7 +163,7 @@ function modal:entered()
     end)
 end
 
-function modal:exited()
+function streamingModal:exited()
     hs.screen.mainScreen():setMode(1920, 1080, 2, 60, 7)
     hs.screen.mainScreen():setMode(1920, 1080, 2, 60, 8)
 
