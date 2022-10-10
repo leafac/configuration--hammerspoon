@@ -118,6 +118,10 @@ function streamingModal:exited()
     streamingOBSCurrentProgramScene = nil
 end
 
+streamingModal:bind({"⌃", "⌥", "⌘"}, "U", function()
+    hs.http.get("http://127.0.0.1:4456/_/SET/TRACK/2/RECARM/-1")
+end)
+
 for key, sceneName in pairs({
     ["R"] = "STARTING SOON…",
     ["T"] = "WE’LL BE RIGHT BACK…",
@@ -155,8 +159,31 @@ for key, sceneName in pairs({
     end)
 end
 
-streamingModal:bind({"⌃", "⌥", "⌘"}, "U", function()
-    hs.http.get("http://127.0.0.1:4456/_/SET/TRACK/2/RECARM/-1")
+streamingModal:bind({"⌃", "⌥", "⌘"}, "space", function()
+    if streamingOBS == nil or
+        (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~=
+            "open") then
+        streamingOBSConnect()
+    else
+        streamingOBS:send([[
+                {
+                    "op": 6,
+                    "d": {
+                        "requestType": "GetStreamStatus",
+                        "requestId": "GetStreamStatus"
+                    }
+                }
+            ]], false)
+        streamingOBS:send([[
+                {
+                    "op": 6,
+                    "d": {
+                        "requestType": "GetRecordStatus",
+                        "requestId": "GetRecordStatus"
+                    }
+                }
+            ]], false)
+    end
 end)
 
 function streamingOBSConnect()
@@ -192,7 +219,8 @@ function streamingOBSConnect()
 end
 
 -------------------------------------------------------------------------------
--- TODO: Add markers to stream/recording.
+-- TODO: Add markers to stream/recording. "/Users/leafac/Videos/MARKERS"
+
 -- TODO: Keycastr
 -------------------------------------------------------------------------------
 -- Show keyboard shortcuts on stream/recording (Work-in-progress)
