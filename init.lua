@@ -79,7 +79,7 @@ function streamingModal:entered()
                     "open") then
                 streamingOBSConnect()
             else
-                streaming:send([[
+                streamingOBS:send([[
                     {
                         "op": 6,
                         "d": {
