@@ -35,11 +35,15 @@ end)
 streamingModal = hs.hotkey.modal.new({"⌘", "⇧"}, "2")
 streamingModal:bind({"⌘", "⇧"}, "2", function() streamingModal:exit() end)
 
-streamingOBS
-obsCurrentProgramScene
-function obsConnect()
+streamingOBS = nil
+streamingOBSCurrentProgramScene = nil
+
+streamingMenubar = nil
+streamingMenubarTimer = nil
+
+function streamingOBSConnect()
     streamingOBS = hs.websocket.new("ws://127.0.0.1:4455/",
-                           function(status, messageString)
+                                    function(status, messageString)
         print([[OBS: ‘]] .. tostring(status) .. [[’: ‘]] ..
                   tostring(messageString) .. [[’]])
         if status == "received" then
@@ -55,17 +59,19 @@ function obsConnect()
                 ]], false)
             elseif message.op == 5 then
                 if message.d.eventType == "CurrentProgramSceneChanged" then
-                    obsCurrentProgramScene = message.d.eventData.sceneName
+                    streamingOBSCurrentProgramScene = message.d.eventData
+                                                          .sceneName
                 end
             elseif message.op == 7 then
                 if message.d.requestId == "GetCurrentProgramScene" then
-                    obsCurrentProgramScene =
+                    streamingOBSCurrentProgramScene =
                         message.d.responseData.currentProgramSceneName
                 end
             end
         end
     end)
 end
+
 for key, sceneName in pairs({
     ["R"] = "STARTING SOON…",
     ["T"] = "WE’LL BE RIGHT BACK…",
@@ -83,8 +89,9 @@ for key, sceneName in pairs({
 }) do
     streamingModal:bind({"⌃", "⌥", "⌘"}, key, function()
         if streamingOBS == nil or
-            (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~= "open") then
-            obsConnect()
+            (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~=
+                "open") then
+            streamingOBSConnect()
         else
             streamingOBS:send([[
                 {
@@ -124,12 +131,10 @@ function streamingModal:entered()
         hs.open("/Users/leafac/Videos/STREAM.rpp")
         hs.application.open("EOS Utility 3")
         hs.application.open("OBS")
-        hs.application.open("Keycastr")
 
-        hs.timer.doAfter(5, obsConnect)
+        hs.timer.doAfter(5, streamingOBSConnect)
 
-        menubar = hs.menubar.new()
-        menubarTimer = hs.timer.doEvery(1, function()
+        streamingMenubarTimer = hs.timer.doEvery(1, function()
             local isMicrophoneOn = (tonumber(
                                        hs.fnutils.split(select(2, hs.http
                                                                    .get(
@@ -137,12 +142,13 @@ function streamingModal:entered()
                                                             "", "\t")[4]) or 0) &
                                        64 ~= 0
 
-            if obs == nil or
-                (obs:status() ~= "connecting" and obs:status() ~= "open") then
-                obsConnect()
-                obsCurrentProgramScene = nil
+            if streamingOBS == nil or
+                (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~=
+                    "open") then
+                streamingOBSConnect()
+                streamingOBSCurrentProgramScene = nil
             else
-                obs:send([[
+                streaming:send([[
                     {
                         "op": 6,
                         "d": {
@@ -153,9 +159,11 @@ function streamingModal:entered()
                 ]], false)
             end
 
-            menubar:setTitle((isMicrophoneOn and "🔴" or "⚫️") ..
-                                 (type(obsCurrentProgramScene) == "string" and
-                                     ([[ ]] .. obsCurrentProgramScene) or ""))
+            streamingMenubar = (isMicrophoneOn and "🔴" or "⬛️") ..
+                                   (type(streamingOBSCurrentProgramScene) ==
+                                       "string" and
+                                       ([[ ]] .. streamingOBSCurrentProgramScene) or
+                                       "")
         end)
     end)
 end
@@ -171,13 +179,13 @@ function streamingModal:exited()
     audioDevice:setDefaultEffectDevice()
     audioDevice:setDefaultInputDevice()
 
-    if obs ~= nil and (obs:status() == "connecting" or obs:status() == "open") then
-        obs:close()
-    end
-    obsCurrentProgramScene = nil
+    if streamingOBS ~= nil and
+        (streamingOBS:status() == "connecting" or streamingOBS:status() ==
+            "open") then streamingOBS:close() end
+    streamingOBSCurrentProgramScene = nil
 
-    menubar:delete()
-    menubarTimer:stop()
+    streamingMenubarTimer:stop()
+    streamingMenubar = nil
 end
 
 -- TODO: Add markers to stream/recording.
