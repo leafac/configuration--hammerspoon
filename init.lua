@@ -39,85 +39,12 @@ end)
 streamingModal = hs.hotkey.modal.new({"⌘", "⇧"}, "2")
 streamingModal:bind({"⌘", "⇧"}, "2", function() streamingModal:exit() end)
 
+streamingMenubarTimer = nil
+
 streamingREAPERMicrophoneEnabled = nil
 
 streamingOBS = nil
 streamingOBSCurrentProgramScene = nil
-
-streamingMenubarTimer = nil
-
-function streamingOBSConnect()
-    streamingOBSCurrentProgramScene = nil
-    streamingOBS = hs.websocket.new("ws://127.0.0.1:4455/",
-                                    function(status, messageString)
-        print([[OBS: ‘]] .. tostring(status) .. [[’: ‘]] ..
-                  tostring(messageString) .. [[’]])
-        if status == "received" then
-            local message = hs.json.decode(messageString)
-            if message.op == 0 then
-                streamingOBS:send([[
-                    {
-                        "op": 1,
-                        "d": {
-                            "rpcVersion": 1
-                        }
-                    }
-                ]], false)
-            elseif message.op == 5 then
-                if message.d.eventType == "CurrentProgramSceneChanged" then
-                    streamingOBSCurrentProgramScene = message.d.eventData
-                                                          .sceneName
-                end
-            elseif message.op == 7 then
-                if message.d.requestId == "GetCurrentProgramScene" then
-                    streamingOBSCurrentProgramScene =
-                        message.d.responseData.currentProgramSceneName
-                end
-            end
-        end
-    end)
-end
-
-for key, sceneName in pairs({
-    ["R"] = "STARTING SOON…",
-    ["T"] = "WE’LL BE RIGHT BACK…",
-    ["Y"] = "THANKS FOR WATCHING",
-    ["F"] = "ME",
-    ["G"] = "GUEST 1",
-    ["H"] = "GUEST 2",
-    ["J"] = "GUEST 3",
-    ["K"] = "GUEST 4",
-    ["V"] = "GRID",
-    ["B"] = "SCREEN",
-    ["N"] = "DESK",
-    ["M"] = "WINDOWS",
-    [","] = "GUEST · SKYPE · SCREEN"
-}) do
-    streamingModal:bind({"⌃", "⌥", "⌘"}, key, function()
-        if streamingOBS == nil or
-            (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~=
-                "open") then
-            streamingOBSConnect()
-        else
-            streamingOBS:send([[
-                {
-                    "op": 6,
-                    "d": {
-                        "requestType": "SetCurrentProgramScene",
-                        "requestId": "SetCurrentProgramScene",
-                        "requestData": {
-                            "sceneName": "]] .. sceneName .. [["
-                        }
-                    }
-                }
-            ]], false)
-        end
-    end)
-end
-
-streamingModal:bind({"⌃", "⌥", "⌘"}, "U", function()
-    hs.http.get("http://127.0.0.1:4456/_/SET/TRACK/2/RECARM/-1")
-end)
 
 function streamingModal:entered()
     hs.osascript.applescript(
@@ -176,16 +103,94 @@ function streamingModal:exited()
     audioDevice:setDefaultOutputDevice()
     audioDevice:setDefaultEffectDevice()
 
+    streamingMenubarTimer:stop()
+    streamingMenubarTimer = nil
+
     streamingREAPERMicrophoneEnabled = nil
 
     if streamingOBS ~= nil and
         (streamingOBS:status() == "connecting" or streamingOBS:status() ==
-            "open") then streamingOBS:close() end
+            "open") then
+        streamingOBS:close()
+        streamingOBS = nil
+    end
     streamingOBSCurrentProgramScene = nil
-
-    streamingMenubarTimer:stop()
 end
 
+for key, sceneName in pairs({
+    ["R"] = "STARTING SOON…",
+    ["T"] = "WE’LL BE RIGHT BACK…",
+    ["Y"] = "THANKS FOR WATCHING",
+    ["F"] = "ME",
+    ["G"] = "GUEST 1",
+    ["H"] = "GUEST 2",
+    ["J"] = "GUEST 3",
+    ["K"] = "GUEST 4",
+    ["V"] = "GRID",
+    ["B"] = "SCREEN",
+    ["N"] = "DESK",
+    ["M"] = "WINDOWS",
+    [","] = "GUEST · SKYPE · SCREEN"
+}) do
+    streamingModal:bind({"⌃", "⌥", "⌘"}, key, function()
+        if streamingOBS == nil or
+            (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~=
+                "open") then
+            streamingOBSConnect()
+        else
+            streamingOBS:send([[
+                {
+                    "op": 6,
+                    "d": {
+                        "requestType": "SetCurrentProgramScene",
+                        "requestId": "SetCurrentProgramScene",
+                        "requestData": {
+                            "sceneName": "]] .. sceneName .. [["
+                        }
+                    }
+                }
+            ]], false)
+        end
+    end)
+end
+
+streamingModal:bind({"⌃", "⌥", "⌘"}, "U", function()
+    hs.http.get("http://127.0.0.1:4456/_/SET/TRACK/2/RECARM/-1")
+end)
+
+function streamingOBSConnect()
+    streamingOBSCurrentProgramScene = nil
+    streamingOBS = hs.websocket.new("ws://127.0.0.1:4455/",
+                                    function(status, messageString)
+        print([[OBS: ‘]] .. tostring(status) .. [[’: ‘]] ..
+                  tostring(messageString) .. [[’]])
+        if status == "received" then
+            local message = hs.json.decode(messageString)
+            if message.op == 0 then
+                streamingOBS:send([[
+                    {
+                        "op": 1,
+                        "d": {
+                            "rpcVersion": 1
+                        }
+                    }
+                ]], false)
+            elseif message.op == 5 then
+                if message.d.eventType == "CurrentProgramSceneChanged" then
+                    streamingOBSCurrentProgramScene = message.d.eventData
+                                                          .sceneName
+                end
+            elseif message.op == 7 then
+                if message.d.requestId == "GetCurrentProgramScene" then
+                    streamingOBSCurrentProgramScene =
+                        message.d.responseData.currentProgramSceneName
+                end
+            end
+        end
+    end)
+end
+
+-------------------------------------------------------------------------------
 -- TODO: Add markers to stream/recording.
 -- TODO: Keycastr
 -------------------------------------------------------------------------------
