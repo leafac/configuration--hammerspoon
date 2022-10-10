@@ -26,7 +26,9 @@ end)
 
 menubar = hs.menubar.new()
 menubarTimer = hs.timer.doEvery(1, function()
-    menubar:setTitle(os.date("%Y-%m-%d  %H:%M  %A"))
+    menubar:setTitle(os.date("%Y-%m-%d  %H:%M  %A") ..
+                         (type(streamingMenubarTitle) == "string" and
+                             ("  " .. streamingMenubarTitle) or ""))
 end)
 
 -------------------------------------------------------------------------------
@@ -38,8 +40,8 @@ streamingModal:bind({"⌘", "⇧"}, "2", function() streamingModal:exit() end)
 streamingOBS = nil
 streamingOBSCurrentProgramScene = nil
 
-streamingMenubar = nil
 streamingMenubarTimer = nil
+streamingMenubarTitle = nil
 
 function streamingOBSConnect()
     streamingOBS = hs.websocket.new("ws://127.0.0.1:4455/",
@@ -159,11 +161,12 @@ function streamingModal:entered()
                 ]], false)
             end
 
-            streamingMenubar = (isMicrophoneOn and "🔴" or "⬛️") ..
-                                   (type(streamingOBSCurrentProgramScene) ==
-                                       "string" and
-                                       ([[ ]] .. streamingOBSCurrentProgramScene) or
-                                       "")
+            streamingMenubarTitle = (isMicrophoneOn and "🔴" or "⬛️") ..
+                                        (type(streamingOBSCurrentProgramScene) ==
+                                            "string" and
+                                            (" " ..
+                                                streamingOBSCurrentProgramScene) or
+                                            "")
         end)
     end)
 end
@@ -185,7 +188,7 @@ function streamingModal:exited()
     streamingOBSCurrentProgramScene = nil
 
     streamingMenubarTimer:stop()
-    streamingMenubar = nil
+    streamingMenubarTitle = nil
 end
 
 -- TODO: Add markers to stream/recording.
