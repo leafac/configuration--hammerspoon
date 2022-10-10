@@ -35,17 +35,17 @@ end)
 streamingModal = hs.hotkey.modal.new({"⌘", "⇧"}, "2")
 streamingModal:bind({"⌘", "⇧"}, "2", function() streamingModal:exit() end)
 
-local obs
-local obsCurrentProgramScene
-local function obsConnect()
-    obs = hs.websocket.new("ws://127.0.0.1:4455/",
+streamingOBS
+obsCurrentProgramScene
+function obsConnect()
+    streamingOBS = hs.websocket.new("ws://127.0.0.1:4455/",
                            function(status, messageString)
         print([[OBS: ‘]] .. tostring(status) .. [[’: ‘]] ..
                   tostring(messageString) .. [[’]])
         if status == "received" then
             local message = hs.json.decode(messageString)
             if message.op == 0 then
-                obs:send([[
+                streamingOBS:send([[
                     {
                         "op": 1,
                         "d": {
@@ -82,11 +82,11 @@ for key, sceneName in pairs({
     [","] = "GUEST · SKYPE · SCREEN"
 }) do
     streamingModal:bind({"⌃", "⌥", "⌘"}, key, function()
-        if obs == nil or
-            (obs:status() ~= "connecting" and obs:status() ~= "open") then
+        if streamingOBS == nil or
+            (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~= "open") then
             obsConnect()
         else
-            obs:send([[
+            streamingOBS:send([[
                 {
                     "op": 6,
                     "d": {
@@ -105,9 +105,6 @@ end
 streamingModal:bind({"⌃", "⌥", "⌘"}, "U", function()
     hs.http.get("http://127.0.0.1:4456/_/SET/TRACK/2/RECARM/-1")
 end)
-
-local menubar
-local menubarTimer
 
 function streamingModal:entered()
     hs.osascript.applescript(
