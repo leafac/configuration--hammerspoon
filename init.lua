@@ -57,11 +57,19 @@ function streamingModal:entered()
 
         hs.wifi.setPower(false)
 
-        local inputDevice = hs.audiodevice.findOutputByName("Call Input")
-        inputDevice:setDefaultInputDevice()
-        local outputDevice = hs.audiodevice.findOutputByName("Computer")
-        outputDevice:setDefaultOutputDevice()
-        outputDevice:setDefaultEffectDevice()
+        for _, name in
+            pairs({"Computer", "Call Input", "Call Output", "Stream"}) do
+            local audioDevice = hs.audiodevice.findDeviceByName(name)
+            audioDevice:setInputMuted(false)
+            audioDevice:setInputVolume(100)
+            audioDevice:setOutputMuted(false)
+            audioDevice:setOutputVolume(100)
+        end
+        local inputAudioDevice = hs.audiodevice.findDeviceByName("Call Input")
+        inputAudioDevice:setDefaultInputDevice()
+        local outputAudioDevice = hs.audiodevice.findDeviceByName("Computer")
+        outputAudioDevice:setDefaultOutputDevice()
+        outputAudioDevice:setDefaultEffectDevice()
 
         hs.open("/Users/leafac/Videos/STREAM.rpp")
         hs.application.open("EOS Utility 3")
@@ -134,7 +142,7 @@ function streamingModal:exited()
 
     hs.wifi.setPower(true)
 
-    local audioDevice = hs.audiodevice.findOutputByName("Audient iD14")
+    local audioDevice = hs.audiodevice.findDeviceByName("Audient iD14")
     audioDevice:setDefaultInputDevice()
     audioDevice:setDefaultOutputDevice()
     audioDevice:setDefaultEffectDevice()
