@@ -236,8 +236,7 @@ function streamingOBSConnect()
     streamingOBSCurrentProgramScene = nil
     streamingOBS = hs.websocket.new("ws://127.0.0.1:4455/",
                                     function(status, messageString)
-        print([[OBS: ‘]] .. tostring(status) .. [[’: ‘]] ..
-                  tostring(messageString) .. [[’]])
+        -- print([[OBS: ‘]] .. tostring(status) .. [[’: ‘]] .. tostring(messageString) .. [[’]])
         if status == "received" then
             local message = hs.json.decode(messageString)
             if message.op == 0 then
