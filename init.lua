@@ -274,7 +274,48 @@ function streamingOBSConnect()
     end)
 end
 
+-------------------------------------------------------------------------------
+-- MOUSE BUTTONS
+
+mouseButtonsEventTap = hs.eventtap.new({hs.eventtap.event.types.otherMouseUp},
+                                       function(event)
+    local button = event:getProperty(hs.eventtap.event.properties
+                                         .mouseEventButtonNumber)
+    local flags = event:getFlags()
+    if button == 3 then
+        if flags.cmd then
+            return true, {
+                hs.eventtap.event.newGesture("beginMagnify"),
+                hs.eventtap.event.newGesture("endMagnify", -0.3)
+            }
+        else
+            return true, {
+                hs.eventtap.event.newGesture("beginSwipeLeft"),
+                hs.eventtap.event.newGesture("endSwipeLeft")
+            }
+        end
+    elseif button == 4 then
+        if flags.cmd then
+            return true, {
+                hs.eventtap.event.newGesture("beginMagnify"),
+                hs.eventtap.event.newGesture("endMagnify", 0.3)
+            }
+        else
+            return true, {
+                hs.eventtap.event.newGesture("beginSwipeRight"),
+                hs.eventtap.event.newGesture("endSwipeRight")
+            }
+        end
+    end
+end):start()
+
 --[[
+
+https://stackoverflow.com/questions/70717694/hold-mouse-key-to-scroll-in-hammerspoon
+
+----
+
+
 -- https://superuser.com/a/1486266
 
 ------------------------------------------------------------------------------------------
