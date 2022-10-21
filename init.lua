@@ -22,6 +22,47 @@ hs.hotkey.bind({"⌃", "⌥", "⌘"}, "tab", function()
 end)
 
 -------------------------------------------------------------------------------
+-- MOUSE BUTTONS
+
+mouseButtonsEventTap = hs.eventtap.new({
+    hs.eventtap.event.types.otherMouseDown, hs.eventtap.event.types.otherMouseUp
+}, function(event)
+    local type = event:getType()
+    local buttonNumber = event:getProperty(
+                             hs.eventtap.event.properties.mouseEventButtonNumber)
+    local flags = event:getFlags()
+    if type == hs.eventtap.event.types.otherMouseDown then
+        if buttonNumber == 3 or buttonNumber == 4 then return true, {} end
+    elseif type == hs.eventtap.event.types.otherMouseUp then
+        if buttonNumber == 3 then
+            if flags.cmd then
+                return true, {
+                    hs.eventtap.event.newGesture("beginMagnify"),
+                    hs.eventtap.event.newGesture("endMagnify", -0.3)
+                }
+            else
+                return true, {
+                    hs.eventtap.event.newGesture("beginSwipeLeft"),
+                    hs.eventtap.event.newGesture("endSwipeLeft")
+                }
+            end
+        elseif buttonNumber == 4 then
+            if flags.cmd then
+                return true, {
+                    hs.eventtap.event.newGesture("beginMagnify"),
+                    hs.eventtap.event.newGesture("endMagnify", 0.3)
+                }
+            else
+                return true, {
+                    hs.eventtap.event.newGesture("beginSwipeRight"),
+                    hs.eventtap.event.newGesture("endSwipeRight")
+                }
+            end
+        end
+    end
+end):start()
+
+-------------------------------------------------------------------------------
 -- MENUBAR
 
 menubar = hs.menubar.new()
@@ -273,47 +314,6 @@ function streamingOBSConnect()
         end
     end)
 end
-
--------------------------------------------------------------------------------
--- MOUSE BUTTONS
-
-mouseButtonsEventTap = hs.eventtap.new({
-    hs.eventtap.event.types.otherMouseDown, hs.eventtap.event.types.otherMouseUp
-}, function(event)
-    local type = event:getType()
-    local buttonNumber = event:getProperty(
-                             hs.eventtap.event.properties.mouseEventButtonNumber)
-    local flags = event:getFlags()
-    if type == hs.eventtap.event.types.otherMouseDown then
-        if buttonNumber == 3 or buttonNumber == 4 then return true, {} end
-    elseif type == hs.eventtap.event.types.otherMouseUp then
-        if buttonNumber == 3 then
-            if flags.cmd then
-                return true, {
-                    hs.eventtap.event.newGesture("beginMagnify"),
-                    hs.eventtap.event.newGesture("endMagnify", -0.3)
-                }
-            else
-                return true, {
-                    hs.eventtap.event.newGesture("beginSwipeLeft"),
-                    hs.eventtap.event.newGesture("endSwipeLeft")
-                }
-            end
-        elseif buttonNumber == 4 then
-            if flags.cmd then
-                return true, {
-                    hs.eventtap.event.newGesture("beginMagnify"),
-                    hs.eventtap.event.newGesture("endMagnify", 0.3)
-                }
-            else
-                return true, {
-                    hs.eventtap.event.newGesture("beginSwipeRight"),
-                    hs.eventtap.event.newGesture("endSwipeRight")
-                }
-            end
-        end
-    end
-end):start()
 
 --[[
 
