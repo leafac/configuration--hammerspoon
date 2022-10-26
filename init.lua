@@ -89,6 +89,8 @@ streamingREAPERMicrophoneEnabled = nil
 streamingOBS = nil
 streamingOBSCurrentProgramScene = nil
 
+streamingMIDIController = nil
+
 function streamingModal:entered()
     hs.osascript.applescript(
         [[do shell script "launchctl kickstart -kp system/com.apple.audio.coreaudiod" with administrator privileges]])
@@ -174,6 +176,17 @@ function streamingModal:entered()
                 ]], false)
             end
         end)
+
+        streamingMIDIController = hs.midi.new("LPK25")
+        if streamingMIDIController ~= nil then
+            streamingMIDIController:callback(
+                function(_, _, commandType, description, metadata)
+                    -- print(description)
+                    if commandType == "noteOn" and metadata.channel == 15 then
+                        print("NOTE ON: " .. tostring(metadata.note))
+                    end
+                end)
+        end
     end)
 end
 
@@ -203,11 +216,39 @@ function streamingModal:exited()
         streamingOBS = nil
     end
     streamingOBSCurrentProgramScene = nil
+
+    if streamingMIDIController ~= nil then
+        streamingMIDIController:callback(nil)
+        streamingMIDIController = nil
+    end
 end
 
-streamingModal:bind({"⌃", "⌥", "⌘"}, "U", function()
+function streamingREAPERToggleMicrophone()
     hs.http.get("http://127.0.0.1:4456/_/SET/TRACK/2/RECARM/-1")
-end)
+end
+
+streamingModal:bind({"⌃", "⌥", "⌘"}, "U", streamingREAPERToggleMicrophone)
+
+function streamingOBSSwitchScene(sceneName)
+    if streamingOBS == nil or
+        (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~=
+            "open") then
+        streamingOBSConnect()
+    else
+        streamingOBS:send([[
+        {
+            "op": 6,
+            "d": {
+                "requestType": "SetCurrentProgramScene",
+                "requestId": "SetCurrentProgramScene",
+                "requestData": {
+                    "sceneName": "]] .. sceneName .. [["
+                }
+            }
+        }
+    ]], false)
+    end
+end
 
 for key, sceneName in pairs({
     ["R"] = "STARTING SOON…",
@@ -224,26 +265,8 @@ for key, sceneName in pairs({
     ["M"] = "WINDOWS",
     [","] = "GUEST · SKYPE · SCREEN"
 }) do
-    streamingModal:bind({"⌃", "⌥", "⌘"}, key, function()
-        if streamingOBS == nil or
-            (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~=
-                "open") then
-            streamingOBSConnect()
-        else
-            streamingOBS:send([[
-                {
-                    "op": 6,
-                    "d": {
-                        "requestType": "SetCurrentProgramScene",
-                        "requestId": "SetCurrentProgramScene",
-                        "requestData": {
-                            "sceneName": "]] .. sceneName .. [["
-                        }
-                    }
-                }
-            ]], false)
-        end
-    end)
+    streamingModal:bind({"⌃", "⌥", "⌘"}, key,
+                        function() streamingOBSSwitchScene(sceneName) end)
 end
 
 streamingModal:bind({"⌃", "⌥", "⌘"}, "space", function()
