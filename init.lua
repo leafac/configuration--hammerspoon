@@ -269,7 +269,7 @@ for key, sceneName in pairs({
                         function() streamingOBSSwitchScene(sceneName) end)
 end
 
-streamingModal:bind({"⌃", "⌥", "⌘"}, "space", function()
+function streamingMarker()
     if streamingOBS == nil or
         (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~=
             "open") then
@@ -294,7 +294,9 @@ streamingModal:bind({"⌃", "⌥", "⌘"}, "space", function()
             }
         ]], false)
     end
-end)
+end
+
+streamingModal:bind({"⌃", "⌥", "⌘"}, "space", streamingMarker)
 
 function streamingOBSConnect()
     streamingOBSCurrentProgramScene = nil
