@@ -276,23 +276,23 @@ streamingModal:bind({"⌃", "⌥", "⌘"}, "space", function()
         streamingOBSConnect()
     else
         streamingOBS:send([[
-                {
-                    "op": 6,
-                    "d": {
-                        "requestType": "GetStreamStatus",
-                        "requestId": "GetStreamStatus"
-                    }
+            {
+                "op": 6,
+                "d": {
+                    "requestType": "GetStreamStatus",
+                    "requestId": "GetStreamStatus"
                 }
-            ]], false)
+            }
+        ]], false)
         streamingOBS:send([[
-                {
-                    "op": 6,
-                    "d": {
-                        "requestType": "GetRecordStatus",
-                        "requestId": "GetRecordStatus"
-                    }
+            {
+                "op": 6,
+                "d": {
+                    "requestType": "GetRecordStatus",
+                    "requestId": "GetRecordStatus"
                 }
-            ]], false)
+            }
+        ]], false)
     end
 end)
 
