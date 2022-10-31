@@ -182,7 +182,34 @@ function streamingModal:entered()
                 function(_, _, commandType, description, metadata)
                     -- print(description)
                     if commandType == "noteOn" and metadata.channel == 15 then
-                        print("NOTE ON: " .. tostring(metadata.note))
+                        if metadata.note == 49 then
+                            streamingREAPERSetMicrophone(true)
+                        end
+                        if metadata.note == 51 then
+                            streamingREAPERSetMicrophone(false)
+                        end
+                        for note, sceneName in pairs({
+                            [48] = "STARTING SOON…",
+                            [50] = "WE’LL BE RIGHT BACK…",
+                            [52] = "THANKS FOR WATCHING",
+                            [53] = "ME",
+                            [54] = "GUEST 1",
+                            [55] = "GUEST 2",
+                            [56] = "GUEST 3",
+                            [57] = "GUEST 4",
+                            [60] = "GRID",
+                            [62] = "SCREEN",
+                            [64] = "DESK",
+                            [65] = "WINDOWS",
+                            [67] = "GUEST · SKYPE · SCREEN"
+                        }) do
+                            if metadata.note == note then
+                                streamingOBSSwitchScene(sceneName)
+                            end
+                        end
+                        if metadata.note == 72 then
+                            streamingMarker()
+                        end
                     end
                 end)
         end
@@ -222,11 +249,15 @@ function streamingModal:exited()
     end
 end
 
-function streamingREAPERToggleMicrophone()
-    hs.http.get("http://127.0.0.1:4456/_/SET/TRACK/2/RECARM/-1")
+function streamingREAPERSetMicrophone(on)
+    hs.http.get("http://127.0.0.1:4456/_/SET/TRACK/2/RECARM/" ..
+                    (on and "1" or "0"))
 end
 
-streamingModal:bind({"⌃", "⌥", "⌘"}, "U", streamingREAPERToggleMicrophone)
+streamingModal:bind({"⌃", "⌥", "⌘"}, "U",
+                    function() streamingREAPERSetMicrophone(true) end)
+streamingModal:bind({"⌃", "⌥", "⌘"}, "I",
+                    function() streamingREAPERSetMicrophone(false) end)
 
 function streamingOBSSwitchScene(sceneName)
     if streamingOBS == nil or
