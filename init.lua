@@ -123,9 +123,8 @@ function streamingModal:entered()
         }, function(event)
             local flags = event:getFlags()
             local character = hs.keycodes.map[event:getKeyCode()]
-            if (not flags.ctrl) and (not flags.alt) and (not flags.cmd) then
-                return
-            end
+            if ((not flags.ctrl) and (not flags.alt) and (not flags.cmd)) or
+                type(character) ~= "string" then return end
             hs.alert.closeAll(0)
             hs.alert(
                 (flags.ctrl and "⌃" or "") .. (flags.alt and "⌥" or "") ..
