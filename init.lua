@@ -30,23 +30,14 @@ mouseButtonsEventTap = hs.eventtap.new({
     local type = event:getType()
     local buttonNumber = event:getProperty(
                              hs.eventtap.event.properties.mouseEventButtonNumber)
+    local buttonNumberBack = 4
+    local buttonNumberForward = 3
     local flags = event:getFlags()
     if type == hs.eventtap.event.types.otherMouseDown then
-        if buttonNumber == 3 or buttonNumber == 4 then return true, {} end
+        if buttonNumber == buttonNumberBack or buttonNumber ==
+            buttonNumberForward then return true, {} end
     elseif type == hs.eventtap.event.types.otherMouseUp then
-        if buttonNumber == 3 then
-            if flags.cmd then
-                return true, {
-                    hs.eventtap.event.newGesture("beginMagnify"),
-                    hs.eventtap.event.newGesture("endMagnify", -0.3)
-                }
-            else
-                return true, {
-                    hs.eventtap.event.newGesture("beginSwipeLeft"),
-                    hs.eventtap.event.newGesture("endSwipeLeft")
-                }
-            end
-        elseif buttonNumber == 4 then
+        if buttonNumber == buttonNumberBack then
             if flags.cmd then
                 return true, {
                     hs.eventtap.event.newGesture("beginMagnify"),
@@ -58,6 +49,53 @@ mouseButtonsEventTap = hs.eventtap.new({
                     hs.eventtap.event.newGesture("endSwipeRight")
                 }
             end
+        elseif buttonNumber == buttonNumberForward then
+            if flags.cmd then
+                return true, {
+                    hs.eventtap.event.newGesture("beginMagnify"),
+                    hs.eventtap.event.newGesture("endMagnify", -0.3)
+                }
+            else
+                return true, {
+                    hs.eventtap.event.newGesture("beginSwipeLeft"),
+                    hs.eventtap.event.newGesture("endSwipeLeft")
+                }
+            end
+        end
+    end
+end):start()
+
+-------------------------------------------------------------------------------
+-- KEYBOARD
+
+mouseButtonsEventTap = hs.eventtap.new({
+    hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp
+}, function(event)
+    local type = event:getType()
+    local keyCode = event:getKeyCode()
+    local keyCodeF4 = 177
+    local keyCodeF5 = 176
+    local keyCodeF6 = 178
+    if type == hs.eventtap.event.types.keyDown then
+        if keyCode == keyCodeF4 then
+            return true, {
+                hs.eventtap.event.newSystemKeyEvent("LAUNCH_PANEL", true),
+                hs.eventtap.event.newSystemKeyEvent("LAUNCH_PANEL", false)
+            }
+        elseif keyCode == keyCodeF5 then
+            -- return true, {
+            --     hs.eventtap.event.newGesture("beginMagnify"),
+            --     hs.eventtap.event.newGesture("endMagnify", 0.3)
+            -- }
+        elseif keyCode == keyCodeF6 then
+            -- return true, {
+            --     hs.eventtap.event.newGesture("beginMagnify"),
+            --     hs.eventtap.event.newGesture("endMagnify", 0.3)
+            -- }
+        end
+    elseif type == hs.eventtap.event.types.keyUp then
+        if keyCode == keyCodeF4 or keyCode == keyCodeF5 or keyCode == keyCodeF6 then
+            return true, {}
         end
     end
 end):start()
