@@ -81,15 +81,15 @@ mouseButtonsEventTap = hs.eventtap.new({
             hs.application.open("Launchpad")
             return true, {}
         elseif keyCode == keyCodeF5 then
-            -- return true, {
-            --     hs.eventtap.event.newGesture("beginMagnify"),
-            --     hs.eventtap.event.newGesture("endMagnify", 0.3)
-            -- }
+            return true, {
+                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_DOWN", true),
+                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_DOWN", false)
+            }
         elseif keyCode == keyCodeF6 then
-            -- return true, {
-            --     hs.eventtap.event.newGesture("beginMagnify"),
-            --     hs.eventtap.event.newGesture("endMagnify", 0.3)
-            -- }
+            return true, {
+                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_UP", true),
+                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_UP", false)
+            }
         end
     elseif type == hs.eventtap.event.types.keyUp then
         if keyCode == keyCodeF4 or keyCode == keyCodeF5 or keyCode == keyCodeF6 then
