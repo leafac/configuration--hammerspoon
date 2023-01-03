@@ -199,7 +199,7 @@ function streamingModal:entered()
                             [57] = "GUEST 4",
                             [60] = "GRID",
                             [62] = "SCREEN",
-                            [64] = "DESK",
+                            [64] = "PHONE",
                             [65] = "WINDOWS",
                             [67] = "GUEST · SKYPE · SCREEN"
                         }) do
@@ -291,7 +291,7 @@ for key, sceneName in pairs({
     ["K"] = "GUEST 4",
     ["V"] = "GRID",
     ["B"] = "SCREEN",
-    ["N"] = "DESK",
+    ["N"] = "PHONE",
     ["M"] = "WINDOWS",
     [","] = "GUEST · SKYPE · SCREEN"
 }) do
