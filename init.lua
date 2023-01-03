@@ -78,10 +78,8 @@ mouseButtonsEventTap = hs.eventtap.new({
     local keyCodeF6 = 178
     if type == hs.eventtap.event.types.keyDown then
         if keyCode == keyCodeF4 then
-            return true, {
-                hs.eventtap.event.newSystemKeyEvent("LAUNCH_PANEL", true),
-                hs.eventtap.event.newSystemKeyEvent("LAUNCH_PANEL", false)
-            }
+            hs.application.open("Launchpad")
+            return true, {}
         elseif keyCode == keyCodeF5 then
             -- return true, {
             --     hs.eventtap.event.newGesture("beginMagnify"),
