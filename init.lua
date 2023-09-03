@@ -68,35 +68,37 @@ end):start()
 -------------------------------------------------------------------------------
 -- KEYBOARD
 
-hs.eventtap.new({
-    hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp
-}, function(event)
-    local type = event:getType()
-    local keyCode = event:getKeyCode()
-    local keyCodeF4 = 177
-    local keyCodeF5 = 176
-    local keyCodeF6 = 178
-    if type == hs.eventtap.event.types.keyDown then
-        if keyCode == keyCodeF4 then
-            hs.application.open("Launchpad")
-            return true, {}
-        elseif keyCode == keyCodeF5 then
-            return true, {
-                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_DOWN", true),
-                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_DOWN", false)
-            }
-        elseif keyCode == keyCodeF6 then
-            return true, {
-                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_UP", true),
-                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_UP", false)
-            }
+hs.eventtap.new(
+    {hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp},
+    function(event)
+        local type = event:getType()
+        local keyCode = event:getKeyCode()
+        local keyCodeF4 = 177
+        local keyCodeF5 = 176
+        local keyCodeF6 = 178
+        if type == hs.eventtap.event.types.keyDown then
+            if keyCode == keyCodeF4 then
+                hs.application.open("Launchpad")
+                return true, {}
+            elseif keyCode == keyCodeF5 then
+                return true, {
+                    hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_DOWN",
+                                                        true),
+                    hs.eventtap.event
+                        .newSystemKeyEvent("ILLUMINATION_DOWN", false)
+                }
+            elseif keyCode == keyCodeF6 then
+                return true, {
+                    hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_UP", true),
+                    hs.eventtap.event
+                        .newSystemKeyEvent("ILLUMINATION_UP", false)
+                }
+            end
+        elseif type == hs.eventtap.event.types.keyUp then
+            if keyCode == keyCodeF4 or keyCode == keyCodeF5 or keyCode ==
+                keyCodeF6 then return true, {} end
         end
-    elseif type == hs.eventtap.event.types.keyUp then
-        if keyCode == keyCodeF4 or keyCode == keyCodeF5 or keyCode == keyCodeF6 then
-            return true, {}
-        end
-    end
-end):start()
+    end):start()
 
 -------------------------------------------------------------------------------
 -- MENUBAR
