@@ -100,6 +100,18 @@ hs.eventtap.new(
         end
     end):start()
 
+hs.hotkey.bind({"⌃", "⌥", "⌘"}, "escape",
+               function() disableKeyboardEventTap:start() end)
+disableKeyboardEventTap = hs.eventtap.new({
+    hs.eventtap.event.types.keyDown, hs.eventtap.event.types.systemDefined
+}, function(event)
+    local flags = event:getFlags()
+    local keyCode = event:getKeyCode()
+    if flags.ctrl and flags.alt and flags.cmd and keyCode ==
+        hs.keycodes.map.escape then disableKeyboardEventTap:stop() end
+    return true
+end)
+
 -------------------------------------------------------------------------------
 -- MENUBAR
 
