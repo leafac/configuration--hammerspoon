@@ -24,7 +24,7 @@ end)
 -------------------------------------------------------------------------------
 -- MOUSE BUTTONS
 
-mouseButtonsEventTap = hs.eventtap.new({
+hs.eventtap.new({
     hs.eventtap.event.types.otherMouseDown, hs.eventtap.event.types.otherMouseUp
 }, function(event)
     local type = event:getType()
@@ -68,7 +68,7 @@ end):start()
 -------------------------------------------------------------------------------
 -- KEYBOARD
 
-mouseButtonsEventTap = hs.eventtap.new({
+hs.eventtap.new({
     hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp
 }, function(event)
     local type = event:getType()
