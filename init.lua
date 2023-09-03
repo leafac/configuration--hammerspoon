@@ -24,7 +24,7 @@ end)
 -------------------------------------------------------------------------------
 -- MOUSE BUTTONS
 
-hs.eventtap.new({
+mouseButtonsEventTap = hs.eventtap.new({
     hs.eventtap.event.types.otherMouseDown, hs.eventtap.event.types.otherMouseUp
 }, function(event)
     local type = event:getType()
@@ -68,37 +68,35 @@ end):start()
 -------------------------------------------------------------------------------
 -- KEYBOARD
 
-hs.eventtap.new(
-    {hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp},
-    function(event)
-        local type = event:getType()
-        local keyCode = event:getKeyCode()
-        local keyCodeF4 = 177
-        local keyCodeF5 = 176
-        local keyCodeF6 = 178
-        if type == hs.eventtap.event.types.keyDown then
-            if keyCode == keyCodeF4 then
-                hs.application.open("Launchpad")
-                return true, {}
-            elseif keyCode == keyCodeF5 then
-                return true, {
-                    hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_DOWN",
-                                                        true),
-                    hs.eventtap.event
-                        .newSystemKeyEvent("ILLUMINATION_DOWN", false)
-                }
-            elseif keyCode == keyCodeF6 then
-                return true, {
-                    hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_UP", true),
-                    hs.eventtap.event
-                        .newSystemKeyEvent("ILLUMINATION_UP", false)
-                }
-            end
-        elseif type == hs.eventtap.event.types.keyUp then
-            if keyCode == keyCodeF4 or keyCode == keyCodeF5 or keyCode ==
-                keyCodeF6 then return true, {} end
+keyboardEventTap = hs.eventtap.new({
+    hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp
+}, function(event)
+    local type = event:getType()
+    local keyCode = event:getKeyCode()
+    local keyCodeF4 = 177
+    local keyCodeF5 = 176
+    local keyCodeF6 = 178
+    if type == hs.eventtap.event.types.keyDown then
+        if keyCode == keyCodeF4 then
+            hs.application.open("Launchpad")
+            return true, {}
+        elseif keyCode == keyCodeF5 then
+            return true, {
+                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_DOWN", true),
+                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_DOWN", false)
+            }
+        elseif keyCode == keyCodeF6 then
+            return true, {
+                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_UP", true),
+                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_UP", false)
+            }
         end
-    end):start()
+    elseif type == hs.eventtap.event.types.keyUp then
+        if keyCode == keyCodeF4 or keyCode == keyCodeF5 or keyCode == keyCodeF6 then
+            return true, {}
+        end
+    end
+end):start()
 
 hs.hotkey.bind({"⌃", "⌥", "⌘"}, "escape",
                function() disableKeyboardEventTap:start() end)
@@ -109,7 +107,7 @@ disableKeyboardEventTap = hs.eventtap.new({
     local keyCode = event:getKeyCode()
     if flags.ctrl and flags.alt and flags.cmd and keyCode ==
         hs.keycodes.map.escape then disableKeyboardEventTap:stop() end
-    return true
+    return true, {}
 end)
 
 -------------------------------------------------------------------------------
