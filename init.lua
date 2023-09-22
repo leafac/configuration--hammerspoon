@@ -1,3 +1,6 @@
+-- $ defaults -currentHost write -g AppleFontSmoothing -int 0
+-- $ sudo launchctl kickstart -kp system/com.apple.audio.coreaudiod
+
 -------------------------------------------------------------------------------
 -- WINDOW MANAGEMENT
 for key, rect in pairs({
