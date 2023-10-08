@@ -1,6 +1,6 @@
 -- $ defaults -currentHost write -g AppleFontSmoothing -int 0
 -- $ sudo launchctl kickstart -kp system/com.apple.audio.coreaudiod
-
+--
 -------------------------------------------------------------------------------
 -- WINDOW MANAGEMENT
 for key, rect in pairs({
@@ -146,10 +146,10 @@ function streamingModal:entered()
     hs.osascript.applescript(
         [[do shell script "launchctl kickstart -kp system/com.apple.audio.coreaudiod" with administrator privileges]])
     hs.timer.doAfter(5, function()
-        hs.screen.mainScreen():setMode(1280, 720, 2, 60, 7)
-        hs.screen.mainScreen():setMode(1280, 720, 2, 60, 8)
+        -- hs.screen.mainScreen():setMode(1280, 720, 2, 60, 7)
+        -- hs.screen.mainScreen():setMode(1280, 720, 2, 60, 8)
 
-        hs.wifi.setPower(false)
+        -- hs.wifi.setPower(false)
 
         for _, name in
             pairs({"Computer", "Call Input", "Call Output", "Stream"}) do
@@ -165,7 +165,7 @@ function streamingModal:entered()
         outputAudioDevice:setDefaultOutputDevice()
         outputAudioDevice:setDefaultEffectDevice()
 
-        hs.open("/Users/leafac/Videos/STREAM.rpp")
+        hs.open("/Users/leafac/Videos/ASSETS/audio/audio.RPP")
         hs.application.open("EOS Utility 3")
         hs.application.open("OBS")
 
@@ -204,7 +204,7 @@ function streamingModal:entered()
         streamingMenubarTimer = hs.timer.doEvery(1, function()
             local REAPERResponse = select(2, hs.http
                                               .get(
-                                              "http://127.0.0.1:4456/_/TRACK/2"))
+                                              "http://127.0.0.1:8080/_/TRACK/2"))
             streamingREAPERMicrophoneEnabled =
                 ((type(REAPERResponse) == "string") and REAPERResponse ~= "") and
                     ((tonumber(hs.fnutils.split(REAPERResponse, "\t")[4]) & 64 ~=
@@ -227,56 +227,58 @@ function streamingModal:entered()
             end
         end)
 
-        streamingMIDIController = hs.midi.new("LPK25")
-        if streamingMIDIController ~= nil then
-            streamingMIDIController:callback(
-                function(_, _, commandType, description, metadata)
-                    -- print(description)
-                    if commandType == "noteOn" and metadata.channel == 15 then
-                        if metadata.note == 49 then
-                            streamingREAPERSetMicrophone(true)
-                        end
-                        if metadata.note == 51 then
-                            streamingREAPERSetMicrophone(false)
-                        end
-                        for note, sceneName in pairs({
-                            [48] = "STARTING SOON…",
-                            [50] = "WE’LL BE RIGHT BACK…",
-                            [52] = "THANKS FOR WATCHING",
-                            [53] = "ME",
-                            [54] = "GUEST 1",
-                            [55] = "GUEST 2",
-                            [56] = "GUEST 3",
-                            [57] = "GUEST 4",
-                            [60] = "GRID",
-                            [62] = "SCREEN",
-                            [64] = "PHONE",
-                            [65] = "WINDOWS",
-                            [67] = "GUEST · SKYPE · SCREEN"
-                        }) do
-                            if metadata.note == note then
-                                streamingOBSSwitchScene(sceneName)
-                            end
-                        end
-                        if metadata.note == 72 then
-                            streamingMarker()
-                        end
-                    end
-                end)
-        end
+        -- streamingMIDIController = hs.midi.new("LPK25")
+        -- if streamingMIDIController ~= nil then
+        --     streamingMIDIController:callback(
+        --         function(_, _, commandType, description, metadata)
+        --             -- print(description)
+        --             if commandType == "noteOn" and metadata.channel == 15 then
+        --                 if metadata.note == 49 then
+        --                     streamingREAPERSetMicrophone(true)
+        --                 end
+        --                 if metadata.note == 51 then
+        --                     streamingREAPERSetMicrophone(false)
+        --                 end
+        --                 for note, sceneName in pairs({
+        --                     [48] = "STARTING SOON…",
+        --                     [50] = "WE’LL BE RIGHT BACK…",
+        --                     [52] = "THANKS FOR WATCHING",
+        --                     [53] = "ME",
+        --                     [54] = "GUEST 1",
+        --                     [55] = "GUEST 2",
+        --                     [56] = "GUEST 3",
+        --                     [57] = "GUEST 4",
+        --                     [60] = "GRID",
+        --                     [62] = "SCREEN",
+        --                     [64] = "PHONE",
+        --                     [65] = "WINDOWS",
+        --                     [67] = "GUEST · SKYPE · SCREEN"
+        --                 }) do
+        --                     if metadata.note == note then
+        --                         streamingOBSSwitchScene(sceneName)
+        --                     end
+        --                 end
+        --                 if metadata.note == 72 then
+        --                     streamingMarker()
+        --                 end
+        --             end
+        --         end)
+        -- end
     end)
 end
 
 function streamingModal:exited()
-    hs.screen.mainScreen():setMode(1920, 1080, 2, 60, 7)
-    hs.screen.mainScreen():setMode(1920, 1080, 2, 60, 8)
+    -- hs.screen.mainScreen():setMode(1920, 1080, 2, 60, 7)
+    -- hs.screen.mainScreen():setMode(1920, 1080, 2, 60, 8)
 
-    hs.wifi.setPower(true)
+    -- hs.wifi.setPower(true)
 
     local audioDevice = hs.audiodevice.findDeviceByName("Audient iD14")
-    audioDevice:setDefaultInputDevice()
-    audioDevice:setDefaultOutputDevice()
-    audioDevice:setDefaultEffectDevice()
+    if audioDevice ~= nil then
+        audioDevice:setDefaultInputDevice()
+        audioDevice:setDefaultOutputDevice()
+        audioDevice:setDefaultEffectDevice()
+    end
 
     streamShowKeysEventTap:stop()
     streamShowKeysEventTap = nil
@@ -301,7 +303,7 @@ function streamingModal:exited()
 end
 
 function streamingREAPERSetMicrophone(on)
-    hs.http.get("http://127.0.0.1:4456/_/SET/TRACK/2/RECARM/" ..
+    hs.http.get("http://127.0.0.1:8080/_/SET/TRACK/2/RECARM/" ..
                     (on and "1" or "0"))
 end
 
@@ -335,16 +337,9 @@ for key, sceneName in pairs({
     ["R"] = "STARTING SOON…",
     ["T"] = "WE’LL BE RIGHT BACK…",
     ["Y"] = "THANKS FOR WATCHING",
-    ["F"] = "ME",
-    ["G"] = "GUEST 1",
-    ["H"] = "GUEST 2",
-    ["J"] = "GUEST 3",
-    ["K"] = "GUEST 4",
-    ["V"] = "GRID",
-    ["B"] = "SCREEN",
-    ["N"] = "PHONE",
-    ["M"] = "WINDOWS",
-    [","] = "GUEST · SKYPE · SCREEN"
+    ["F"] = "CAMERA",
+    ["G"] = "WEBCAM",
+    ["H"] = "SCREEN"
 }) do
     streamingModal:bind({"⌃", "⌥", "⌘"}, key,
                         function() streamingOBSSwitchScene(sceneName) end)
