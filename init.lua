@@ -167,7 +167,7 @@ function streamingModal:entered()
 
         hs.open("/Users/leafac/Videos/ASSETS/audio/audio.RPP")
         hs.application.open("EOS Utility 3")
-        hs.timer.doAfter(5, function() hs.application.open("OBS") end)
+        -- hs.application.open("OBS")
 
         streamShowKeysEventTap = hs.eventtap.new({
             hs.eventtap.event.types.keyDown
