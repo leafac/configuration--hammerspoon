@@ -2,7 +2,42 @@
 -- $ sudo launchctl kickstart -kp system/com.apple.audio.coreaudiod
 --
 -------------------------------------------------------------------------------
+-- ROUNDED CORNERS
+roundedCornersCanvases = {}
+
+function roundedCorners()
+    for _ = 1, #roundedCornersCanvases do
+        table.remove(roundedCornersCanvases):delete()
+    end
+
+    for _, screen in pairs(hs.screen.allScreens()) do
+        table.insert(roundedCornersCanvases,
+                     hs.canvas.new(screen:fullFrame()):appendElements({
+            action = "build",
+            type = "rectangle"
+        }, {
+            action = "clip",
+            type = "rectangle",
+            roundedRectRadii = {xRadius = 10, yRadius = 10},
+            reversePath = true
+        }, {
+            action = "fill",
+            type = "rectangle",
+            fillColor = {red = 0, green = 0, blue = 0}
+        }):behavior(hs.canvas.windowBehaviors.canJoinAllSpaces):level(hs.canvas
+                                                                          .windowLevels
+                                                                          .screenSaver +
+                                                                          1)
+                         :show())
+    end
+end
+
+roundedCorners()
+roundedCornersScreenWatcher = hs.screen.watcher.new(roundedCorners):start()
+
+-------------------------------------------------------------------------------
 -- WINDOW MANAGEMENT
+
 for key, rect in pairs({
     ["Q"] = {x = 0, y = 0, w = 0.5, h = 0.5},
     ["W"] = {x = 0, y = 0, w = 1, h = 0.5},
