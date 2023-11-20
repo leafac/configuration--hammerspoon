@@ -2,7 +2,18 @@
 -- $ sudo launchctl kickstart -kp system/com.apple.audio.coreaudiod
 --
 -------------------------------------------------------------------------------
+-- DARK MODE
+hs.hotkey.bind({"⌃", "⌥", "⌘"}, "return", function()
+    hs.osascript.applescript(
+        [[tell application "System Events" to tell appearance preferences to set dark mode to ]] ..
+            (select(2, hs.osascript.applescript(
+                        [[tell application "System Events" to tell appearance preferences to return dark mode]])) and
+                "false" or "true"))
+end)
+
+-------------------------------------------------------------------------------
 -- WINDOW MANAGEMENT
+
 for key, rect in pairs({
     ["Q"] = {x = 0, y = 0, w = 0.5, h = 0.5},
     ["W"] = {x = 0, y = 0, w = 1, h = 0.5},
