@@ -350,7 +350,8 @@ for key, sceneName in pairs({
     ["Y"] = "THANKS FOR WATCHING",
     ["F"] = "CAMERA",
     ["G"] = "WEBCAM",
-    ["H"] = "SCREEN"
+    ["H"] = "GRID",
+    ["J"] = "SCREEN"
 }) do
     streamingModal:bind({"⌃", "⌥", "⌘"}, key,
                         function() streamingOBSSwitchScene(sceneName) end)
