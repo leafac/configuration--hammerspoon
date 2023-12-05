@@ -176,7 +176,7 @@ function streamingModal:entered()
         outputAudioDevice:setDefaultOutputDevice()
         outputAudioDevice:setDefaultEffectDevice()
 
-        hs.open("/Users/leafac/Videos/ASSETS/audio/audio.RPP")
+        hs.open("/Users/leafac/Library/Application Support/obs-studio/audio/audio.RPP")
         hs.application.open("EOS Utility 3")
         -- hs.application.open("OBS")
 
