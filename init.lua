@@ -36,7 +36,7 @@ hs.hotkey.bind({"⌃", "⌥", "⌘"}, "tab", function()
 end)
 
 -------------------------------------------------------------------------------
--- MOUSE BUTTONS
+-- MOUSE
 
 mouseButtonsEventTap = hs.eventtap.new({
     hs.eventtap.event.types.otherMouseDown, hs.eventtap.event.types.otherMouseUp
@@ -176,7 +176,8 @@ function streamingModal:entered()
         outputAudioDevice:setDefaultOutputDevice()
         outputAudioDevice:setDefaultEffectDevice()
 
-        hs.open("/Users/leafac/Library/Application Support/obs-studio/audio/audio.RPP")
+        hs.open(
+            "/Users/leafac/Library/Application Support/obs-studio/audio/audio.RPP")
         hs.application.open("EOS Utility 3")
         -- hs.application.open("OBS")
 
