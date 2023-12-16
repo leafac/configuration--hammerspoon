@@ -3,15 +3,28 @@
 --
 -------------------------------------------------------------------------------
 -- DISABLE KEYBOARD FOR CLEANING
-hs.hotkey.bind({"⌃", "⌥", "⌘"}, "escape",
-               function() disableKeyboardEventTap:start() end)
+hs.hotkey.bind({"⌃", "⌥", "⌘"}, "escape", function()
+    disableKeyboardEventTap:start()
+    hs.alert("⌨️ KEYBOARD DISABLED", {
+        strokeWidth = 0,
+        fillColor = {white = 0.1},
+        textColor = {white = 0.9},
+        textSize = 11,
+        radius = 5,
+        fadeInDuration = 0,
+        atScreenEdge = 1
+    }, hs.screen.mainScreen(), true)
+end)
 disableKeyboardEventTap = hs.eventtap.new({
     hs.eventtap.event.types.keyDown, hs.eventtap.event.types.systemDefined
 }, function(event)
     local flags = event:getFlags()
     local keyCode = event:getKeyCode()
     if flags.ctrl and flags.alt and flags.cmd and keyCode ==
-        hs.keycodes.map.escape then disableKeyboardEventTap:stop() end
+        hs.keycodes.map.escape then
+        disableKeyboardEventTap:stop()
+        hs.alert.closeAll(0)
+    end
     return true, {}
 end)
 
@@ -223,7 +236,7 @@ function streamingModal:entered()
             streamingREAPERMicrophoneEnabled =
                 ((type(REAPERResponse) == "string") and REAPERResponse ~= "") and
                     ((tonumber(hs.fnutils.split(REAPERResponse, "\t")[4]) & 64 ~=
-                        0) and "🔴" or "⬛️") or nil
+                        0) and "🎤" or "🤫") or nil
 
             if streamingOBS == nil or
                 (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~=
