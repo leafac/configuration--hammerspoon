@@ -191,8 +191,8 @@ end)
 -------------------------------------------------------------------------------
 -- STREAMING
 
-streamingModal = hs.hotkey.modal.new({"⌘", "⇧"}, "2")
-streamingModal:bind({"⌘", "⇧"}, "2", function() streamingModal:exit() end)
+streamingModal = hs.hotkey.modal.new({"⇧", "⌘"}, "2")
+streamingModal:bind({"⇧", "⌘"}, "2", function() streamingModal:exit() end)
 
 streamShowKeysEventTap = nil
 
