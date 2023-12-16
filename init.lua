@@ -477,3 +477,53 @@ function streamingOBSConnect()
         end
     end)
 end
+
+streamingSecondaryModal = hs.hotkey.modal.new({"⌥", "⇧", "⌘"}, "2")
+streamingSecondaryModal:bind({"⌥", "⇧", "⌘"}, "2",
+                             function() streamingSecondaryModal:exit() end)
+
+streamSecondaryShowKeysEventTap = nil
+
+function streamingSecondaryModal:entered()
+    hs.wifi.setPower(false)
+
+    hs.application.open("OBS")
+
+    streamSecondaryShowKeysEventTap = hs.eventtap.new({
+        hs.eventtap.event.types.keyDown
+    }, function(event)
+        local flags = event:getFlags()
+        local character = hs.keycodes.map[event:getKeyCode()]
+        if ((not flags.ctrl) and (not flags.alt) and (not flags.cmd)) or
+            type(character) ~= "string" then return end
+        hs.alert.closeAll(0)
+        hs.alert((flags.ctrl and "⌃" or "") .. (flags.alt and "⌥" or "") ..
+                     (flags.shift and "⇧" or "") ..
+                     (flags.cmd and "⌘" or "") .. string.gsub(({
+            ["return"] = "⏎",
+            ["delete"] = "⌫",
+            ["escape"] = "⎋",
+            ["space"] = "␣",
+            ["tab"] = "⇥",
+            ["up"] = "↑",
+            ["down"] = "↓",
+            ["left"] = "←",
+            ["right"] = "→"
+        })[character] or character, "^%l", string.upper), {
+            strokeWidth = 0,
+            fillColor = {white = 0.1},
+            textColor = {white = 0.9},
+            textSize = 11,
+            radius = 5,
+            fadeInDuration = 0,
+            atScreenEdge = 1
+        })
+    end):start()
+end
+
+function streamingSecondaryModal:exited()
+    hs.wifi.setPower(true)
+
+    streamSecondaryShowKeysEventTap:stop()
+    streamSecondaryShowKeysEventTap = nil
+end
