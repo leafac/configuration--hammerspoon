@@ -231,7 +231,7 @@ function streamingModal:entered()
         hs.open(
             "/Users/leafac/Library/Application Support/obs-studio/audio/audio.RPP")
         hs.application.open("EOS Utility 3")
-        -- hs.application.open("OBS")
+        hs.application.open("OBS")
 
         streamShowKeysEventTap = hs.eventtap.new({
             hs.eventtap.event.types.keyDown
@@ -272,7 +272,7 @@ function streamingModal:entered()
             streamingREAPERMicrophoneEnabled =
                 ((type(REAPERResponse) == "string") and REAPERResponse ~= "") and
                     ((tonumber(hs.fnutils.split(REAPERResponse, "\t")[4]) & 64 ~=
-                        0) and "🎤" or "🤫") or nil
+                        0) and "🎤" or "❌") or nil
 
             if streamingOBS == nil or
                 (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~=
@@ -367,14 +367,13 @@ function streamingModal:exited()
 end
 
 function streamingREAPERSetMicrophone(on)
-    hs.http.get("http://127.0.0.1:8080/_/SET/TRACK/2/RECARM/" ..
-                    (on and "1" or "0"))
+    hs.http.get(
+        "http://127.0.0.1:8080/_/SET/TRACK/2/RECARM/" .. -- (on and "1" or "0")
+        "-1")
 end
 
-streamingModal:bind({"⌃", "⌥", "⌘"}, "U",
+streamingModal:bind({"⌃", "⌥", "⌘"}, "M",
                     function() streamingREAPERSetMicrophone(true) end)
-streamingModal:bind({"⌃", "⌥", "⌘"}, "I",
-                    function() streamingREAPERSetMicrophone(false) end)
 
 function streamingOBSSwitchScene(sceneName)
     if streamingOBS == nil or
@@ -402,9 +401,7 @@ for key, sceneName in pairs({
     ["T"] = "WE’LL BE RIGHT BACK…",
     ["Y"] = "THANKS FOR WATCHING",
     ["F"] = "CAMERA",
-    ["G"] = "WEBCAM",
-    ["H"] = "GRID",
-    ["J"] = "SCREEN"
+    ["G"] = "SCREEN"
 }) do
     streamingModal:bind({"⌃", "⌥", "⌘"}, key,
                         function() streamingOBSSwitchScene(sceneName) end)
