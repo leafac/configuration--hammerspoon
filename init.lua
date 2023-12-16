@@ -2,38 +2,51 @@
 -- $ sudo launchctl kickstart -kp system/com.apple.audio.coreaudiod
 --
 -------------------------------------------------------------------------------
--- DARK MODE
-hs.hotkey.bind({"⌃", "⌥", "⌘"}, "return", function()
-    hs.osascript.applescript(
-        [[tell application "System Events" to tell appearance preferences to set dark mode to ]] ..
-            (select(2, hs.osascript.applescript(
-                        [[tell application "System Events" to tell appearance preferences to return dark mode]])) and
-                "false" or "true"))
+-- DISABLE KEYBOARD FOR CLEANING
+hs.hotkey.bind({"⌃", "⌥", "⌘"}, "escape",
+               function() disableKeyboardEventTap:start() end)
+disableKeyboardEventTap = hs.eventtap.new({
+    hs.eventtap.event.types.keyDown, hs.eventtap.event.types.systemDefined
+}, function(event)
+    local flags = event:getFlags()
+    local keyCode = event:getKeyCode()
+    if flags.ctrl and flags.alt and flags.cmd and keyCode ==
+        hs.keycodes.map.escape then disableKeyboardEventTap:stop() end
+    return true, {}
 end)
 
 -------------------------------------------------------------------------------
--- WINDOW MANAGEMENT
+-- MACBOOK KEYBOARD FUNCTION KEYS
 
-for key, rect in pairs({
-    ["Q"] = {x = 0, y = 0, w = 0.5, h = 0.5},
-    ["W"] = {x = 0, y = 0, w = 1, h = 0.5},
-    ["E"] = {x = 0.5, y = 0, w = 0.5, h = 0.5},
-    ["A"] = {x = 0, y = 0, w = 0.5, h = 1},
-    ["S"] = {x = 0, y = 0, w = 1, h = 1},
-    ["D"] = {x = 0.5, y = 0, w = 0.5, h = 1},
-    ["Z"] = {x = 0, y = 0.5, w = 0.5, h = 0.5},
-    ["X"] = {x = 0, y = 0.5, w = 1, h = 0.5},
-    ["C"] = {x = 0.5, y = 0.5, w = 0.5, h = 0.5}
-}) do
-    hs.hotkey.bind({"⌃", "⌥", "⌘"}, key, function()
-        hs.window.focusedWindow():move(rect, nil, true)
-    end)
-end
-
-hs.hotkey.bind({"⌃", "⌥", "⌘"}, "tab", function()
-    hs.window.focusedWindow():moveToScreen(
-        hs.window.focusedWindow():screen():next(), true, true)
-end)
+keyboardEventTap = hs.eventtap.new({
+    hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp
+}, function(event)
+    local type = event:getType()
+    local keyCode = event:getKeyCode()
+    local keyCodeF4 = 177
+    local keyCodeF5 = 176
+    local keyCodeF6 = 178
+    if type == hs.eventtap.event.types.keyDown then
+        if keyCode == keyCodeF4 then
+            hs.application.open("Launchpad")
+            return true, {}
+        elseif keyCode == keyCodeF5 then
+            return true, {
+                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_DOWN", true),
+                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_DOWN", false)
+            }
+        elseif keyCode == keyCodeF6 then
+            return true, {
+                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_UP", true),
+                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_UP", false)
+            }
+        end
+    elseif type == hs.eventtap.event.types.keyUp then
+        if keyCode == keyCodeF4 or keyCode == keyCodeF5 or keyCode == keyCodeF6 then
+            return true, {}
+        end
+    end
+end):start()
 
 -------------------------------------------------------------------------------
 -- MOUSE
@@ -80,48 +93,38 @@ mouseButtonsEventTap = hs.eventtap.new({
 end):start()
 
 -------------------------------------------------------------------------------
--- KEYBOARD
+-- DARK MODE
 
-keyboardEventTap = hs.eventtap.new({
-    hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp
-}, function(event)
-    local type = event:getType()
-    local keyCode = event:getKeyCode()
-    local keyCodeF4 = 177
-    local keyCodeF5 = 176
-    local keyCodeF6 = 178
-    if type == hs.eventtap.event.types.keyDown then
-        if keyCode == keyCodeF4 then
-            hs.application.open("Launchpad")
-            return true, {}
-        elseif keyCode == keyCodeF5 then
-            return true, {
-                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_DOWN", true),
-                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_DOWN", false)
-            }
-        elseif keyCode == keyCodeF6 then
-            return true, {
-                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_UP", true),
-                hs.eventtap.event.newSystemKeyEvent("ILLUMINATION_UP", false)
-            }
-        end
-    elseif type == hs.eventtap.event.types.keyUp then
-        if keyCode == keyCodeF4 or keyCode == keyCodeF5 or keyCode == keyCodeF6 then
-            return true, {}
-        end
-    end
-end):start()
+hs.hotkey.bind({"⌃", "⌥", "⌘"}, "return", function()
+    hs.osascript.applescript(
+        [[tell application "System Events" to tell appearance preferences to set dark mode to ]] ..
+            (select(2, hs.osascript.applescript(
+                        [[tell application "System Events" to tell appearance preferences to return dark mode]])) and
+                "false" or "true"))
+end)
 
-hs.hotkey.bind({"⌃", "⌥", "⌘"}, "escape",
-               function() disableKeyboardEventTap:start() end)
-disableKeyboardEventTap = hs.eventtap.new({
-    hs.eventtap.event.types.keyDown, hs.eventtap.event.types.systemDefined
-}, function(event)
-    local flags = event:getFlags()
-    local keyCode = event:getKeyCode()
-    if flags.ctrl and flags.alt and flags.cmd and keyCode ==
-        hs.keycodes.map.escape then disableKeyboardEventTap:stop() end
-    return true, {}
+-------------------------------------------------------------------------------
+-- WINDOW MANAGEMENT
+
+for key, rect in pairs({
+    ["Q"] = {x = 0, y = 0, w = 0.5, h = 0.5},
+    ["W"] = {x = 0, y = 0, w = 1, h = 0.5},
+    ["E"] = {x = 0.5, y = 0, w = 0.5, h = 0.5},
+    ["A"] = {x = 0, y = 0, w = 0.5, h = 1},
+    ["S"] = {x = 0, y = 0, w = 1, h = 1},
+    ["D"] = {x = 0.5, y = 0, w = 0.5, h = 1},
+    ["Z"] = {x = 0, y = 0.5, w = 0.5, h = 0.5},
+    ["X"] = {x = 0, y = 0.5, w = 1, h = 0.5},
+    ["C"] = {x = 0.5, y = 0.5, w = 0.5, h = 0.5}
+}) do
+    hs.hotkey.bind({"⌃", "⌥", "⌘"}, key, function()
+        hs.window.focusedWindow():move(rect, nil, true)
+    end)
+end
+
+hs.hotkey.bind({"⌃", "⌥", "⌘"}, "tab", function()
+    hs.window.focusedWindow():moveToScreen(
+        hs.window.focusedWindow():screen():next(), true, true)
 end)
 
 -------------------------------------------------------------------------------
