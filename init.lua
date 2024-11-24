@@ -8,12 +8,12 @@ hs.execute([[defaults -currentHost write -g AppleFontSmoothing -int 0]])
 -------------------------------------------------------------------------------
 -- DISABLE KEYBOARD FOR CLEANING
 
-hs.hotkey.bind({"⌃", "⌥", "⌘"}, "escape", function()
+hs.hotkey.bind({ "⌃", "⌥", "⌘" }, "escape", function()
     disableKeyboardEventTap:start()
     hs.alert("⌨️ KEYBOARD DISABLED", {
         strokeWidth = 0,
-        fillColor = {white = 0.1},
-        textColor = {white = 0.9},
+        fillColor = { white = 0.1 },
+        textColor = { white = 0.9 },
         textSize = 11,
         radius = 5,
         fadeInDuration = 0,
@@ -74,13 +74,15 @@ mouseButtonsEventTap = hs.eventtap.new({
 }, function(event)
     local type = event:getType()
     local buttonNumber = event:getProperty(
-                             hs.eventtap.event.properties.mouseEventButtonNumber)
+        hs.eventtap.event.properties.mouseEventButtonNumber)
     local buttonNumberBack = 4
     local buttonNumberForward = 3
     local flags = event:getFlags()
     if type == hs.eventtap.event.types.otherMouseDown then
         if buttonNumber == buttonNumberBack or buttonNumber ==
-            buttonNumberForward then return true, {} end
+            buttonNumberForward then
+            return true, {}
+        end
     elseif type == hs.eventtap.event.types.otherMouseUp then
         if buttonNumber == buttonNumberBack then
             if flags.cmd then
@@ -113,34 +115,34 @@ end):start()
 -------------------------------------------------------------------------------
 -- DARK MODE
 
-hs.hotkey.bind({"⌃", "⌥", "⌘"}, "return", function()
+hs.hotkey.bind({ "⌃", "⌥", "⌘" }, "return", function()
     hs.osascript.applescript(
         [[tell application "System Events" to tell appearance preferences to set dark mode to ]] ..
-            (select(2, hs.osascript.applescript(
-                        [[tell application "System Events" to tell appearance preferences to return dark mode]])) and
-                "false" or "true"))
+        (select(2, hs.osascript.applescript(
+                [[tell application "System Events" to tell appearance preferences to return dark mode]])) and
+            "false" or "true"))
 end)
 
 -------------------------------------------------------------------------------
 -- WINDOW TILING
 
 for key, rect in pairs({
-    ["Q"] = {x = 0, y = 0, w = 0.5, h = 0.5},
-    ["W"] = {x = 0, y = 0, w = 1, h = 0.5},
-    ["E"] = {x = 0.5, y = 0, w = 0.5, h = 0.5},
-    ["A"] = {x = 0, y = 0, w = 0.5, h = 1},
-    ["S"] = {x = 0, y = 0, w = 1, h = 1},
-    ["D"] = {x = 0.5, y = 0, w = 0.5, h = 1},
-    ["Z"] = {x = 0, y = 0.5, w = 0.5, h = 0.5},
-    ["X"] = {x = 0, y = 0.5, w = 1, h = 0.5},
-    ["C"] = {x = 0.5, y = 0.5, w = 0.5, h = 0.5}
+    ["Q"] = { x = 0, y = 0, w = 0.5, h = 0.5 },
+    ["W"] = { x = 0, y = 0, w = 1, h = 0.5 },
+    ["E"] = { x = 0.5, y = 0, w = 0.5, h = 0.5 },
+    ["A"] = { x = 0, y = 0, w = 0.5, h = 1 },
+    ["S"] = { x = 0, y = 0, w = 1, h = 1 },
+    ["D"] = { x = 0.5, y = 0, w = 0.5, h = 1 },
+    ["Z"] = { x = 0, y = 0.5, w = 0.5, h = 0.5 },
+    ["X"] = { x = 0, y = 0.5, w = 1, h = 0.5 },
+    ["C"] = { x = 0.5, y = 0.5, w = 0.5, h = 0.5 }
 }) do
-    hs.hotkey.bind({"⌃", "⌥", "⌘"}, key, function()
+    hs.hotkey.bind({ "⌃", "⌥", "⌘" }, key, function()
         hs.window.focusedWindow():move(rect, nil, true)
     end)
 end
 
-hs.hotkey.bind({"⌃", "⌥", "⌘"}, "tab", function()
+hs.hotkey.bind({ "⌃", "⌥", "⌘" }, "tab", function()
     hs.window.focusedWindow():moveToScreen(
         hs.window.focusedWindow():screen():next(), true, true)
 end)
@@ -187,17 +189,17 @@ end)
 menubar = hs.menubar.new()
 menubarTimer = hs.timer.doEvery(1, function()
     menubar:setTitle(os.date("%Y-%m-%d  %H:%M  %A") ..
-                         (type(streamingREAPERMicrophoneEnabled) == "string" and
-                             (" · " .. streamingREAPERMicrophoneEnabled) or "") ..
-                         (type(streamingOBSCurrentProgramScene) == "string" and
-                             (" · " .. streamingOBSCurrentProgramScene) or ""))
+        (type(streamingREAPERMicrophoneEnabled) == "string" and
+            (" · " .. streamingREAPERMicrophoneEnabled) or "") ..
+        (type(streamingOBSCurrentProgramScene) == "string" and
+            (" · " .. streamingOBSCurrentProgramScene) or ""))
 end)
 
 -------------------------------------------------------------------------------
 -- STREAMING
 
-streamingModal = hs.hotkey.modal.new({"⇧", "⌘"}, "2")
-streamingModal:bind({"⇧", "⌘"}, "2", function() streamingModal:exit() end)
+streamingModal = hs.hotkey.modal.new({ "⇧", "⌘" }, "2")
+streamingModal:bind({ "⇧", "⌘" }, "2", function() streamingModal:exit() end)
 
 streamShowKeysEventTap = nil
 
@@ -220,7 +222,7 @@ function streamingModal:entered()
         -- hs.wifi.setPower(false)
 
         for _, name in
-            pairs({"Computer", "Call Input", "Call Output", "Stream"}) do
+        pairs({ "Computer", "Call Input", "Call Output", "Stream" }) do
             local audioDevice = hs.audiodevice.findDeviceByName(name)
             audioDevice:setInputMuted(false)
             audioDevice:setInputVolume(100)
@@ -244,25 +246,27 @@ function streamingModal:entered()
             local flags = event:getFlags()
             local character = hs.keycodes.map[event:getKeyCode()]
             if ((not flags.ctrl) and (not flags.alt) and (not flags.cmd)) or
-                type(character) ~= "string" then return end
+                type(character) ~= "string" then
+                return
+            end
             hs.alert.closeAll(0)
             hs.alert(
                 (flags.ctrl and "⌃" or "") .. (flags.alt and "⌥" or "") ..
-                    (flags.shift and "⇧" or "") .. (flags.cmd and "⌘" or "") ..
-                    string.gsub(({
-                        ["return"] = "⏎",
-                        ["delete"] = "⌫",
-                        ["escape"] = "⎋",
-                        ["space"] = "␣",
-                        ["tab"] = "⇥",
-                        ["up"] = "↑",
-                        ["down"] = "↓",
-                        ["left"] = "←",
-                        ["right"] = "→"
-                    })[character] or character, "^%l", string.upper), {
+                (flags.shift and "⇧" or "") .. (flags.cmd and "⌘" or "") ..
+                string.gsub(({
+                    ["return"] = "⏎",
+                    ["delete"] = "⌫",
+                    ["escape"] = "⎋",
+                    ["space"] = "␣",
+                    ["tab"] = "⇥",
+                    ["up"] = "↑",
+                    ["down"] = "↓",
+                    ["left"] = "←",
+                    ["right"] = "→"
+                })[character] or character, "^%l", string.upper), {
                     strokeWidth = 0,
-                    fillColor = {white = 0.1},
-                    textColor = {white = 0.9},
+                    fillColor = { white = 0.1 },
+                    textColor = { white = 0.9 },
                     textSize = 11,
                     radius = 5,
                     fadeInDuration = 0,
@@ -272,12 +276,12 @@ function streamingModal:entered()
 
         streamingMenubarTimer = hs.timer.doEvery(1, function()
             local REAPERResponse = select(2, hs.http
-                                              .get(
-                                              "http://127.0.0.1:8080/_/TRACK/2"))
+                .get(
+                    "http://127.0.0.1:8080/_/TRACK/2"))
             streamingREAPERMicrophoneEnabled =
                 ((type(REAPERResponse) == "string") and REAPERResponse ~= "") and
-                    ((tonumber(hs.fnutils.split(REAPERResponse, "\t")[4]) & 64 ~=
-                        0) and "🎤" or "❌") or nil
+                ((tonumber(hs.fnutils.split(REAPERResponse, "\t")[4]) & 64 ~=
+                    0) and "🎤" or "❌") or nil
 
             if streamingOBS == nil or
                 (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~=
@@ -377,8 +381,8 @@ function streamingREAPERSetMicrophone(on)
         "-1")
 end
 
-streamingModal:bind({"⌃", "⌥", "⌘"}, "M",
-                    function() streamingREAPERSetMicrophone(true) end)
+streamingModal:bind({ "⌃", "⌥", "⌘" }, "M",
+    function() streamingREAPERSetMicrophone(true) end)
 
 function streamingOBSSwitchScene(sceneName)
     if streamingOBS == nil or
@@ -408,8 +412,8 @@ for key, sceneName in pairs({
     ["F"] = "CAMERA",
     ["G"] = "SCREEN"
 }) do
-    streamingModal:bind({"⌃", "⌥", "⌘"}, key,
-                        function() streamingOBSSwitchScene(sceneName) end)
+    streamingModal:bind({ "⌃", "⌥", "⌘" }, key,
+        function() streamingOBSSwitchScene(sceneName) end)
 end
 
 function streamingMarker()
@@ -439,17 +443,17 @@ function streamingMarker()
     end
 end
 
-streamingModal:bind({"⌃", "⌥", "⌘"}, "space", streamingMarker)
+streamingModal:bind({ "⌃", "⌥", "⌘" }, "space", streamingMarker)
 
 function streamingOBSConnect()
     streamingOBSCurrentProgramScene = nil
     streamingOBS = hs.websocket.new("ws://127.0.0.1:4455/",
-                                    function(status, messageString)
-        -- print([[OBS: ‘]] .. tostring(status) .. [[’: ‘]] .. tostring(messageString) .. [[’]])
-        if status == "received" then
-            local message = hs.json.decode(messageString)
-            if message.op == 0 then
-                streamingOBS:send([[
+        function(status, messageString)
+            -- print([[OBS: ‘]] .. tostring(status) .. [[’: ‘]] .. tostring(messageString) .. [[’]])
+            if status == "received" then
+                local message = hs.json.decode(messageString)
+                if message.op == 0 then
+                    streamingOBS:send([[
                     {
                         "op": 1,
                         "d": {
@@ -457,35 +461,35 @@ function streamingOBSConnect()
                         }
                     }
                 ]], false)
-            elseif message.op == 5 then
-                if message.d.eventType == "CurrentProgramSceneChanged" then
-                    streamingOBSCurrentProgramScene = message.d.eventData
-                                                          .sceneName
-                end
-            elseif message.op == 7 then
-                if message.d.requestId == "GetCurrentProgramScene" then
-                    streamingOBSCurrentProgramScene =
-                        message.d.responseData.currentProgramSceneName
-                elseif message.d.requestId == "GetStreamStatus" or
-                    message.d.requestId == "GetRecordStatus" then
-                    if message.d.responseData.outputActive then
-                        local file = assert(io.open(
-                                                "/Users/leafac/Videos/MARKERS.txt",
-                                                "a"))
-                        file:write(string.sub(
-                                       message.d.responseData.outputTimecode, 1,
-                                       string.len("00:00:00")) .. "\n")
-                        file:close()
+                elseif message.op == 5 then
+                    if message.d.eventType == "CurrentProgramSceneChanged" then
+                        streamingOBSCurrentProgramScene = message.d.eventData
+                            .sceneName
+                    end
+                elseif message.op == 7 then
+                    if message.d.requestId == "GetCurrentProgramScene" then
+                        streamingOBSCurrentProgramScene =
+                            message.d.responseData.currentProgramSceneName
+                    elseif message.d.requestId == "GetStreamStatus" or
+                        message.d.requestId == "GetRecordStatus" then
+                        if message.d.responseData.outputActive then
+                            local file = assert(io.open(
+                                "/Users/leafac/Videos/MARKERS.txt",
+                                "a"))
+                            file:write(string.sub(
+                                message.d.responseData.outputTimecode, 1,
+                                string.len("00:00:00")) .. "\n")
+                            file:close()
+                        end
                     end
                 end
             end
-        end
-    end)
+        end)
 end
 
-streamingSecondaryModal = hs.hotkey.modal.new({"⌥", "⇧", "⌘"}, "2")
-streamingSecondaryModal:bind({"⌥", "⇧", "⌘"}, "2",
-                             function() streamingSecondaryModal:exit() end)
+streamingSecondaryModal = hs.hotkey.modal.new({ "⌥", "⇧", "⌘" }, "2")
+streamingSecondaryModal:bind({ "⌥", "⇧", "⌘" }, "2",
+    function() streamingSecondaryModal:exit() end)
 
 streamSecondaryShowKeysEventTap = nil
 
@@ -500,29 +504,31 @@ function streamingSecondaryModal:entered()
         local flags = event:getFlags()
         local character = hs.keycodes.map[event:getKeyCode()]
         if ((not flags.ctrl) and (not flags.alt) and (not flags.cmd)) or
-            type(character) ~= "string" then return end
+            type(character) ~= "string" then
+            return
+        end
         hs.alert.closeAll(0)
         hs.alert((flags.ctrl and "⌃" or "") .. (flags.alt and "⌥" or "") ..
-                     (flags.shift and "⇧" or "") ..
-                     (flags.cmd and "⌘" or "") .. string.gsub(({
-            ["return"] = "⏎",
-            ["delete"] = "⌫",
-            ["escape"] = "⎋",
-            ["space"] = "␣",
-            ["tab"] = "⇥",
-            ["up"] = "↑",
-            ["down"] = "↓",
-            ["left"] = "←",
-            ["right"] = "→"
-        })[character] or character, "^%l", string.upper), {
-            strokeWidth = 0,
-            fillColor = {white = 0.1},
-            textColor = {white = 0.9},
-            textSize = 11,
-            radius = 5,
-            fadeInDuration = 0,
-            atScreenEdge = 1
-        })
+            (flags.shift and "⇧" or "") ..
+            (flags.cmd and "⌘" or "") .. string.gsub(({
+                ["return"] = "⏎",
+                ["delete"] = "⌫",
+                ["escape"] = "⎋",
+                ["space"] = "␣",
+                ["tab"] = "⇥",
+                ["up"] = "↑",
+                ["down"] = "↓",
+                ["left"] = "←",
+                ["right"] = "→"
+            })[character] or character, "^%l", string.upper), {
+                strokeWidth = 0,
+                fillColor = { white = 0.1 },
+                textColor = { white = 0.9 },
+                textSize = 11,
+                radius = 5,
+                fadeInDuration = 0,
+                atScreenEdge = 1
+            })
     end):start()
 end
 
