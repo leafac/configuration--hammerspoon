@@ -1,8 +1,13 @@
--- $ defaults -currentHost write -g AppleFontSmoothing -int 0
--- $ sudo launchctl kickstart -kp system/com.apple.audio.coreaudiod
+-------------------------------------------------------------------------------
+-- TURN OFF FONT SMOOTHING
 --
+-- Reference: https://tonsky.me/blog/monitors/#turn-off-font-smoothing
+
+hs.execute([[defaults -currentHost write -g AppleFontSmoothing -int 0]])
+
 -------------------------------------------------------------------------------
 -- DISABLE KEYBOARD FOR CLEANING
+
 hs.hotkey.bind({"⌃", "⌥", "⌘"}, "escape", function()
     disableKeyboardEventTap:start()
     hs.alert("⌨️ KEYBOARD DISABLED", {
