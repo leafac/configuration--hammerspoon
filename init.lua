@@ -195,346 +195,346 @@ menubarTimer = hs.timer.doEvery(1, function()
             (" · " .. streamingOBSCurrentProgramScene) or ""))
 end)
 
--------------------------------------------------------------------------------
--- STREAMING
+-- -------------------------------------------------------------------------------
+-- -- STREAMING
 
-streamingModal = hs.hotkey.modal.new({ "⇧", "⌘" }, "2")
-streamingModal:bind({ "⇧", "⌘" }, "2", function() streamingModal:exit() end)
+-- streamingModal = hs.hotkey.modal.new({ "⇧", "⌘" }, "2")
+-- streamingModal:bind({ "⇧", "⌘" }, "2", function() streamingModal:exit() end)
 
-streamShowKeysEventTap = nil
+-- streamShowKeysEventTap = nil
 
-streamingMenubarTimer = nil
+-- streamingMenubarTimer = nil
 
-streamingREAPERMicrophoneEnabled = nil
+-- streamingREAPERMicrophoneEnabled = nil
 
-streamingOBS = nil
-streamingOBSCurrentProgramScene = nil
+-- streamingOBS = nil
+-- streamingOBSCurrentProgramScene = nil
 
-streamingMIDIController = nil
+-- streamingMIDIController = nil
 
-function streamingModal:entered()
-    hs.osascript.applescript(
-        [[do shell script "launchctl kickstart -kp system/com.apple.audio.coreaudiod" with administrator privileges]])
-    hs.timer.doAfter(5, function()
-        -- hs.screen.mainScreen():setMode(1280, 720, 2, 60, 7)
-        -- hs.screen.mainScreen():setMode(1280, 720, 2, 60, 8)
+-- function streamingModal:entered()
+--     hs.osascript.applescript(
+--         [[do shell script "launchctl kickstart -kp system/com.apple.audio.coreaudiod" with administrator privileges]])
+--     hs.timer.doAfter(5, function()
+--         -- hs.screen.mainScreen():setMode(1280, 720, 2, 60, 7)
+--         -- hs.screen.mainScreen():setMode(1280, 720, 2, 60, 8)
 
-        -- hs.wifi.setPower(false)
+--         -- hs.wifi.setPower(false)
 
-        for _, name in
-        pairs({ "Computer", "Call Input", "Call Output", "Stream" }) do
-            local audioDevice = hs.audiodevice.findDeviceByName(name)
-            audioDevice:setInputMuted(false)
-            audioDevice:setInputVolume(100)
-            audioDevice:setOutputMuted(false)
-            audioDevice:setOutputVolume(100)
-        end
-        local inputAudioDevice = hs.audiodevice.findDeviceByName("Call Input")
-        inputAudioDevice:setDefaultInputDevice()
-        local outputAudioDevice = hs.audiodevice.findDeviceByName("Computer")
-        outputAudioDevice:setDefaultOutputDevice()
-        outputAudioDevice:setDefaultEffectDevice()
+--         for _, name in
+--         pairs({ "Computer", "Call Input", "Call Output", "Stream" }) do
+--             local audioDevice = hs.audiodevice.findDeviceByName(name)
+--             audioDevice:setInputMuted(false)
+--             audioDevice:setInputVolume(100)
+--             audioDevice:setOutputMuted(false)
+--             audioDevice:setOutputVolume(100)
+--         end
+--         local inputAudioDevice = hs.audiodevice.findDeviceByName("Call Input")
+--         inputAudioDevice:setDefaultInputDevice()
+--         local outputAudioDevice = hs.audiodevice.findDeviceByName("Computer")
+--         outputAudioDevice:setDefaultOutputDevice()
+--         outputAudioDevice:setDefaultEffectDevice()
 
-        hs.open(
-            "/Users/leafac/Library/Application Support/obs-studio/audio/audio.RPP")
-        hs.application.open("EOS Utility 3")
-        hs.application.open("OBS")
+--         hs.open(
+--             "/Users/leafac/Library/Application Support/obs-studio/audio/audio.RPP")
+--         hs.application.open("EOS Utility 3")
+--         hs.application.open("OBS")
 
-        streamShowKeysEventTap = hs.eventtap.new({
-            hs.eventtap.event.types.keyDown
-        }, function(event)
-            local flags = event:getFlags()
-            local character = hs.keycodes.map[event:getKeyCode()]
-            if ((not flags.ctrl) and (not flags.alt) and (not flags.cmd)) or
-                type(character) ~= "string" then
-                return
-            end
-            hs.alert.closeAll(0)
-            hs.alert(
-                (flags.ctrl and "⌃" or "") .. (flags.alt and "⌥" or "") ..
-                (flags.shift and "⇧" or "") .. (flags.cmd and "⌘" or "") ..
-                string.gsub(({
-                    ["return"] = "⏎",
-                    ["delete"] = "⌫",
-                    ["escape"] = "⎋",
-                    ["space"] = "␣",
-                    ["tab"] = "⇥",
-                    ["up"] = "↑",
-                    ["down"] = "↓",
-                    ["left"] = "←",
-                    ["right"] = "→"
-                })[character] or character, "^%l", string.upper), {
-                    strokeWidth = 0,
-                    fillColor = { white = 0.1 },
-                    textColor = { white = 0.9 },
-                    textSize = 11,
-                    radius = 5,
-                    fadeInDuration = 0,
-                    atScreenEdge = 1
-                })
-        end):start()
+--         streamShowKeysEventTap = hs.eventtap.new({
+--             hs.eventtap.event.types.keyDown
+--         }, function(event)
+--             local flags = event:getFlags()
+--             local character = hs.keycodes.map[event:getKeyCode()]
+--             if ((not flags.ctrl) and (not flags.alt) and (not flags.cmd)) or
+--                 type(character) ~= "string" then
+--                 return
+--             end
+--             hs.alert.closeAll(0)
+--             hs.alert(
+--                 (flags.ctrl and "⌃" or "") .. (flags.alt and "⌥" or "") ..
+--                 (flags.shift and "⇧" or "") .. (flags.cmd and "⌘" or "") ..
+--                 string.gsub(({
+--                     ["return"] = "⏎",
+--                     ["delete"] = "⌫",
+--                     ["escape"] = "⎋",
+--                     ["space"] = "␣",
+--                     ["tab"] = "⇥",
+--                     ["up"] = "↑",
+--                     ["down"] = "↓",
+--                     ["left"] = "←",
+--                     ["right"] = "→"
+--                 })[character] or character, "^%l", string.upper), {
+--                     strokeWidth = 0,
+--                     fillColor = { white = 0.1 },
+--                     textColor = { white = 0.9 },
+--                     textSize = 11,
+--                     radius = 5,
+--                     fadeInDuration = 0,
+--                     atScreenEdge = 1
+--                 })
+--         end):start()
 
-        streamingMenubarTimer = hs.timer.doEvery(1, function()
-            local REAPERResponse = select(2, hs.http
-                .get(
-                    "http://127.0.0.1:8080/_/TRACK/2"))
-            streamingREAPERMicrophoneEnabled =
-                ((type(REAPERResponse) == "string") and REAPERResponse ~= "") and
-                ((tonumber(hs.fnutils.split(REAPERResponse, "\t")[4]) & 64 ~=
-                    0) and "🎤" or "❌") or nil
+--         streamingMenubarTimer = hs.timer.doEvery(1, function()
+--             local REAPERResponse = select(2, hs.http
+--                 .get(
+--                     "http://127.0.0.1:8080/_/TRACK/2"))
+--             streamingREAPERMicrophoneEnabled =
+--                 ((type(REAPERResponse) == "string") and REAPERResponse ~= "") and
+--                 ((tonumber(hs.fnutils.split(REAPERResponse, "\t")[4]) & 64 ~=
+--                     0) and "🎤" or "❌") or nil
 
-            if streamingOBS == nil or
-                (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~=
-                    "open") then
-                streamingOBSConnect()
-            else
-                streamingOBS:send([[
-                    {
-                        "op": 6,
-                        "d": {
-                            "requestType": "GetCurrentProgramScene",
-                            "requestId": "GetCurrentProgramScene"
-                        }
-                    }
-                ]], false)
-            end
-        end)
+--             if streamingOBS == nil or
+--                 (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~=
+--                     "open") then
+--                 streamingOBSConnect()
+--             else
+--                 streamingOBS:send([[
+--                     {
+--                         "op": 6,
+--                         "d": {
+--                             "requestType": "GetCurrentProgramScene",
+--                             "requestId": "GetCurrentProgramScene"
+--                         }
+--                     }
+--                 ]], false)
+--             end
+--         end)
 
-        -- streamingMIDIController = hs.midi.new("LPK25")
-        -- if streamingMIDIController ~= nil then
-        --     streamingMIDIController:callback(
-        --         function(_, _, commandType, description, metadata)
-        --             -- print(description)
-        --             if commandType == "noteOn" and metadata.channel == 15 then
-        --                 if metadata.note == 49 then
-        --                     streamingREAPERSetMicrophone(true)
-        --                 end
-        --                 if metadata.note == 51 then
-        --                     streamingREAPERSetMicrophone(false)
-        --                 end
-        --                 for note, sceneName in pairs({
-        --                     [48] = "STARTING SOON…",
-        --                     [50] = "WE’LL BE RIGHT BACK…",
-        --                     [52] = "THANKS FOR WATCHING",
-        --                     [53] = "ME",
-        --                     [54] = "GUEST 1",
-        --                     [55] = "GUEST 2",
-        --                     [56] = "GUEST 3",
-        --                     [57] = "GUEST 4",
-        --                     [60] = "GRID",
-        --                     [62] = "SCREEN",
-        --                     [64] = "PHONE",
-        --                     [65] = "WINDOWS",
-        --                     [67] = "GUEST · SKYPE · SCREEN"
-        --                 }) do
-        --                     if metadata.note == note then
-        --                         streamingOBSSwitchScene(sceneName)
-        --                     end
-        --                 end
-        --                 if metadata.note == 72 then
-        --                     streamingMarker()
-        --                 end
-        --             end
-        --         end)
-        -- end
-    end)
-end
+--         -- streamingMIDIController = hs.midi.new("LPK25")
+--         -- if streamingMIDIController ~= nil then
+--         --     streamingMIDIController:callback(
+--         --         function(_, _, commandType, description, metadata)
+--         --             -- print(description)
+--         --             if commandType == "noteOn" and metadata.channel == 15 then
+--         --                 if metadata.note == 49 then
+--         --                     streamingREAPERSetMicrophone(true)
+--         --                 end
+--         --                 if metadata.note == 51 then
+--         --                     streamingREAPERSetMicrophone(false)
+--         --                 end
+--         --                 for note, sceneName in pairs({
+--         --                     [48] = "STARTING SOON…",
+--         --                     [50] = "WE’LL BE RIGHT BACK…",
+--         --                     [52] = "THANKS FOR WATCHING",
+--         --                     [53] = "ME",
+--         --                     [54] = "GUEST 1",
+--         --                     [55] = "GUEST 2",
+--         --                     [56] = "GUEST 3",
+--         --                     [57] = "GUEST 4",
+--         --                     [60] = "GRID",
+--         --                     [62] = "SCREEN",
+--         --                     [64] = "PHONE",
+--         --                     [65] = "WINDOWS",
+--         --                     [67] = "GUEST · SKYPE · SCREEN"
+--         --                 }) do
+--         --                     if metadata.note == note then
+--         --                         streamingOBSSwitchScene(sceneName)
+--         --                     end
+--         --                 end
+--         --                 if metadata.note == 72 then
+--         --                     streamingMarker()
+--         --                 end
+--         --             end
+--         --         end)
+--         -- end
+--     end)
+-- end
 
-function streamingModal:exited()
-    -- hs.screen.mainScreen():setMode(1920, 1080, 2, 60, 7)
-    -- hs.screen.mainScreen():setMode(1920, 1080, 2, 60, 8)
+-- function streamingModal:exited()
+--     -- hs.screen.mainScreen():setMode(1920, 1080, 2, 60, 7)
+--     -- hs.screen.mainScreen():setMode(1920, 1080, 2, 60, 8)
 
-    -- hs.wifi.setPower(true)
+--     -- hs.wifi.setPower(true)
 
-    local audioDevice = hs.audiodevice.findDeviceByName("Audient iD14")
-    if audioDevice ~= nil then
-        audioDevice:setDefaultInputDevice()
-        audioDevice:setDefaultOutputDevice()
-        audioDevice:setDefaultEffectDevice()
-    end
+--     local audioDevice = hs.audiodevice.findDeviceByName("Audient iD14")
+--     if audioDevice ~= nil then
+--         audioDevice:setDefaultInputDevice()
+--         audioDevice:setDefaultOutputDevice()
+--         audioDevice:setDefaultEffectDevice()
+--     end
 
-    streamShowKeysEventTap:stop()
-    streamShowKeysEventTap = nil
+--     streamShowKeysEventTap:stop()
+--     streamShowKeysEventTap = nil
 
-    streamingMenubarTimer:stop()
-    streamingMenubarTimer = nil
+--     streamingMenubarTimer:stop()
+--     streamingMenubarTimer = nil
 
-    streamingREAPERMicrophoneEnabled = nil
+--     streamingREAPERMicrophoneEnabled = nil
 
-    if streamingOBS ~= nil and
-        (streamingOBS:status() == "connecting" or streamingOBS:status() ==
-            "open") then
-        streamingOBS:close()
-        streamingOBS = nil
-    end
-    streamingOBSCurrentProgramScene = nil
+--     if streamingOBS ~= nil and
+--         (streamingOBS:status() == "connecting" or streamingOBS:status() ==
+--             "open") then
+--         streamingOBS:close()
+--         streamingOBS = nil
+--     end
+--     streamingOBSCurrentProgramScene = nil
 
-    if streamingMIDIController ~= nil then
-        streamingMIDIController:callback(nil)
-        streamingMIDIController = nil
-    end
-end
+--     if streamingMIDIController ~= nil then
+--         streamingMIDIController:callback(nil)
+--         streamingMIDIController = nil
+--     end
+-- end
 
-function streamingREAPERSetMicrophone(on)
-    hs.http.get(
-        "http://127.0.0.1:8080/_/SET/TRACK/2/RECARM/" .. -- (on and "1" or "0")
-        "-1")
-end
+-- function streamingREAPERSetMicrophone(on)
+--     hs.http.get(
+--         "http://127.0.0.1:8080/_/SET/TRACK/2/RECARM/" .. -- (on and "1" or "0")
+--         "-1")
+-- end
 
-streamingModal:bind({ "⌃", "⌥", "⌘" }, "M",
-    function() streamingREAPERSetMicrophone(true) end)
+-- streamingModal:bind({ "⌃", "⌥", "⌘" }, "M",
+--     function() streamingREAPERSetMicrophone(true) end)
 
-function streamingOBSSwitchScene(sceneName)
-    if streamingOBS == nil or
-        (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~=
-            "open") then
-        streamingOBSConnect()
-    else
-        streamingOBS:send([[
-        {
-            "op": 6,
-            "d": {
-                "requestType": "SetCurrentProgramScene",
-                "requestId": "SetCurrentProgramScene",
-                "requestData": {
-                    "sceneName": "]] .. sceneName .. [["
-                }
-            }
-        }
-    ]], false)
-    end
-end
+-- function streamingOBSSwitchScene(sceneName)
+--     if streamingOBS == nil or
+--         (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~=
+--             "open") then
+--         streamingOBSConnect()
+--     else
+--         streamingOBS:send([[
+--         {
+--             "op": 6,
+--             "d": {
+--                 "requestType": "SetCurrentProgramScene",
+--                 "requestId": "SetCurrentProgramScene",
+--                 "requestData": {
+--                     "sceneName": "]] .. sceneName .. [["
+--                 }
+--             }
+--         }
+--     ]], false)
+--     end
+-- end
 
-for key, sceneName in pairs({
-    ["R"] = "STARTING SOON…",
-    ["T"] = "WE’LL BE RIGHT BACK…",
-    ["Y"] = "THANKS FOR WATCHING",
-    ["F"] = "CAMERA",
-    ["G"] = "SCREEN"
-}) do
-    streamingModal:bind({ "⌃", "⌥", "⌘" }, key,
-        function() streamingOBSSwitchScene(sceneName) end)
-end
+-- for key, sceneName in pairs({
+--     ["R"] = "STARTING SOON…",
+--     ["T"] = "WE’LL BE RIGHT BACK…",
+--     ["Y"] = "THANKS FOR WATCHING",
+--     ["F"] = "CAMERA",
+--     ["G"] = "SCREEN"
+-- }) do
+--     streamingModal:bind({ "⌃", "⌥", "⌘" }, key,
+--         function() streamingOBSSwitchScene(sceneName) end)
+-- end
 
-function streamingMarker()
-    if streamingOBS == nil or
-        (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~=
-            "open") then
-        streamingOBSConnect()
-    else
-        streamingOBS:send([[
-            {
-                "op": 6,
-                "d": {
-                    "requestType": "GetStreamStatus",
-                    "requestId": "GetStreamStatus"
-                }
-            }
-        ]], false)
-        streamingOBS:send([[
-            {
-                "op": 6,
-                "d": {
-                    "requestType": "GetRecordStatus",
-                    "requestId": "GetRecordStatus"
-                }
-            }
-        ]], false)
-    end
-end
+-- function streamingMarker()
+--     if streamingOBS == nil or
+--         (streamingOBS:status() ~= "connecting" and streamingOBS:status() ~=
+--             "open") then
+--         streamingOBSConnect()
+--     else
+--         streamingOBS:send([[
+--             {
+--                 "op": 6,
+--                 "d": {
+--                     "requestType": "GetStreamStatus",
+--                     "requestId": "GetStreamStatus"
+--                 }
+--             }
+--         ]], false)
+--         streamingOBS:send([[
+--             {
+--                 "op": 6,
+--                 "d": {
+--                     "requestType": "GetRecordStatus",
+--                     "requestId": "GetRecordStatus"
+--                 }
+--             }
+--         ]], false)
+--     end
+-- end
 
-streamingModal:bind({ "⌃", "⌥", "⌘" }, "space", streamingMarker)
+-- streamingModal:bind({ "⌃", "⌥", "⌘" }, "space", streamingMarker)
 
-function streamingOBSConnect()
-    streamingOBSCurrentProgramScene = nil
-    streamingOBS = hs.websocket.new("ws://127.0.0.1:4455/",
-        function(status, messageString)
-            -- print([[OBS: ‘]] .. tostring(status) .. [[’: ‘]] .. tostring(messageString) .. [[’]])
-            if status == "received" then
-                local message = hs.json.decode(messageString)
-                if message.op == 0 then
-                    streamingOBS:send([[
-                    {
-                        "op": 1,
-                        "d": {
-                            "rpcVersion": 1
-                        }
-                    }
-                ]], false)
-                elseif message.op == 5 then
-                    if message.d.eventType == "CurrentProgramSceneChanged" then
-                        streamingOBSCurrentProgramScene = message.d.eventData
-                            .sceneName
-                    end
-                elseif message.op == 7 then
-                    if message.d.requestId == "GetCurrentProgramScene" then
-                        streamingOBSCurrentProgramScene =
-                            message.d.responseData.currentProgramSceneName
-                    elseif message.d.requestId == "GetStreamStatus" or
-                        message.d.requestId == "GetRecordStatus" then
-                        if message.d.responseData.outputActive then
-                            local file = assert(io.open(
-                                "/Users/leafac/Videos/MARKERS.txt",
-                                "a"))
-                            file:write(string.sub(
-                                message.d.responseData.outputTimecode, 1,
-                                string.len("00:00:00")) .. "\n")
-                            file:close()
-                        end
-                    end
-                end
-            end
-        end)
-end
+-- function streamingOBSConnect()
+--     streamingOBSCurrentProgramScene = nil
+--     streamingOBS = hs.websocket.new("ws://127.0.0.1:4455/",
+--         function(status, messageString)
+--             -- print([[OBS: ‘]] .. tostring(status) .. [[’: ‘]] .. tostring(messageString) .. [[’]])
+--             if status == "received" then
+--                 local message = hs.json.decode(messageString)
+--                 if message.op == 0 then
+--                     streamingOBS:send([[
+--                     {
+--                         "op": 1,
+--                         "d": {
+--                             "rpcVersion": 1
+--                         }
+--                     }
+--                 ]], false)
+--                 elseif message.op == 5 then
+--                     if message.d.eventType == "CurrentProgramSceneChanged" then
+--                         streamingOBSCurrentProgramScene = message.d.eventData
+--                             .sceneName
+--                     end
+--                 elseif message.op == 7 then
+--                     if message.d.requestId == "GetCurrentProgramScene" then
+--                         streamingOBSCurrentProgramScene =
+--                             message.d.responseData.currentProgramSceneName
+--                     elseif message.d.requestId == "GetStreamStatus" or
+--                         message.d.requestId == "GetRecordStatus" then
+--                         if message.d.responseData.outputActive then
+--                             local file = assert(io.open(
+--                                 "/Users/leafac/Videos/MARKERS.txt",
+--                                 "a"))
+--                             file:write(string.sub(
+--                                 message.d.responseData.outputTimecode, 1,
+--                                 string.len("00:00:00")) .. "\n")
+--                             file:close()
+--                         end
+--                     end
+--                 end
+--             end
+--         end)
+-- end
 
-streamingSecondaryModal = hs.hotkey.modal.new({ "⌥", "⇧", "⌘" }, "2")
-streamingSecondaryModal:bind({ "⌥", "⇧", "⌘" }, "2",
-    function() streamingSecondaryModal:exit() end)
+-- streamingSecondaryModal = hs.hotkey.modal.new({ "⌥", "⇧", "⌘" }, "2")
+-- streamingSecondaryModal:bind({ "⌥", "⇧", "⌘" }, "2",
+--     function() streamingSecondaryModal:exit() end)
 
-streamSecondaryShowKeysEventTap = nil
+-- streamSecondaryShowKeysEventTap = nil
 
-function streamingSecondaryModal:entered()
-    hs.wifi.setPower(false)
+-- function streamingSecondaryModal:entered()
+--     hs.wifi.setPower(false)
 
-    hs.application.open("OBS")
+--     hs.application.open("OBS")
 
-    streamSecondaryShowKeysEventTap = hs.eventtap.new({
-        hs.eventtap.event.types.keyDown
-    }, function(event)
-        local flags = event:getFlags()
-        local character = hs.keycodes.map[event:getKeyCode()]
-        if ((not flags.ctrl) and (not flags.alt) and (not flags.cmd)) or
-            type(character) ~= "string" then
-            return
-        end
-        hs.alert.closeAll(0)
-        hs.alert((flags.ctrl and "⌃" or "") .. (flags.alt and "⌥" or "") ..
-            (flags.shift and "⇧" or "") ..
-            (flags.cmd and "⌘" or "") .. string.gsub(({
-                ["return"] = "⏎",
-                ["delete"] = "⌫",
-                ["escape"] = "⎋",
-                ["space"] = "␣",
-                ["tab"] = "⇥",
-                ["up"] = "↑",
-                ["down"] = "↓",
-                ["left"] = "←",
-                ["right"] = "→"
-            })[character] or character, "^%l", string.upper), {
-                strokeWidth = 0,
-                fillColor = { white = 0.1 },
-                textColor = { white = 0.9 },
-                textSize = 11,
-                radius = 5,
-                fadeInDuration = 0,
-                atScreenEdge = 1
-            })
-    end):start()
-end
+--     streamSecondaryShowKeysEventTap = hs.eventtap.new({
+--         hs.eventtap.event.types.keyDown
+--     }, function(event)
+--         local flags = event:getFlags()
+--         local character = hs.keycodes.map[event:getKeyCode()]
+--         if ((not flags.ctrl) and (not flags.alt) and (not flags.cmd)) or
+--             type(character) ~= "string" then
+--             return
+--         end
+--         hs.alert.closeAll(0)
+--         hs.alert((flags.ctrl and "⌃" or "") .. (flags.alt and "⌥" or "") ..
+--             (flags.shift and "⇧" or "") ..
+--             (flags.cmd and "⌘" or "") .. string.gsub(({
+--                 ["return"] = "⏎",
+--                 ["delete"] = "⌫",
+--                 ["escape"] = "⎋",
+--                 ["space"] = "␣",
+--                 ["tab"] = "⇥",
+--                 ["up"] = "↑",
+--                 ["down"] = "↓",
+--                 ["left"] = "←",
+--                 ["right"] = "→"
+--             })[character] or character, "^%l", string.upper), {
+--                 strokeWidth = 0,
+--                 fillColor = { white = 0.1 },
+--                 textColor = { white = 0.9 },
+--                 textSize = 11,
+--                 radius = 5,
+--                 fadeInDuration = 0,
+--                 atScreenEdge = 1
+--             })
+--     end):start()
+-- end
 
-function streamingSecondaryModal:exited()
-    hs.wifi.setPower(true)
+-- function streamingSecondaryModal:exited()
+--     hs.wifi.setPower(true)
 
-    streamSecondaryShowKeysEventTap:stop()
-    streamSecondaryShowKeysEventTap = nil
-end
+--     streamSecondaryShowKeysEventTap:stop()
+--     streamSecondaryShowKeysEventTap = nil
+-- end
