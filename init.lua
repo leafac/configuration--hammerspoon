@@ -46,7 +46,7 @@ keyboardEventTap = hs.eventtap.new({
     local keyCodeF6 = 178
     if type == hs.eventtap.event.types.keyDown then
         if keyCode == keyCodeF4 then
-            hs.application.open("Launchpad")
+            hs.application.open("Apps")
             return true, {}
         elseif keyCode == keyCodeF5 then
             return true, {
