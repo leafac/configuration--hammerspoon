@@ -1,3 +1,5 @@
+-- $ brew install git node yt-dlp ffmpeg dbeaver-community google-chrome vlc firefox google-drive keka transmission whatsapp font-roboto-mono hammerspoon visual-studio-code zoom
+
 -------------------------------------------------------------------------------
 -- TURN OFF FONT SMOOTHING
 --
