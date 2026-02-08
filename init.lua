@@ -1,4 +1,4 @@
--- $ brew install git node yt-dlp ffmpeg dbeaver-community google-chrome vlc firefox google-drive keka transmission whatsapp font-roboto-mono hammerspoon visual-studio-code zoom
+-- $ brew install node && brew install --cask backblaze dbeaver-community docker-desktop firefox font-roboto-mono google-chrome google-drive hammerspoon keka transmission visual-studio-code vlc whatsapp zoom
 
 -------------------------------------------------------------------------------
 -- TURN OFF FONT SMOOTHING
